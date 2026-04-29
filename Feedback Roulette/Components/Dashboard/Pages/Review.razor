@@ -1,0 +1,57 @@
+@page "/review"
+@layout DashboardLayout
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <div class="back-link">
+            <a href="/dashboard"><i class="bi bi-arrow-left"></i> Review #47321</a>
+        </div>
+        <button class="btn-skip">Skip</button>
+    </header>
+
+    <div class="review-grid">
+        <div class="review-main card-custom">
+            <div class="content-info">
+                <span class="category-tag">Music / Metalcore</span>
+                <h2>Beyond The Chaos - Final Mix</h2>
+                <span class="author">by JohnD</span>
+            </div>
+
+            <div class="player-container">
+                <button class="play-main"><i class="bi bi-play-fill"></i></button>
+                <div class="waveform">
+                    <div class="wave-bar" style="height: 40%;"></div>
+                    <div class="wave-bar" style="height: 60%;"></div>
+                    <div class="wave-bar" style="height: 80%;"></div>
+                    <div class="wave-bar active" style="height: 100%;"></div>
+                    <div class="wave-bar" style="height: 70%;"></div>
+                    <div class="wave-bar" style="height: 50%;"></div>
+                    <!-- More bars... -->
+                </div>
+                <span class="duration">3:45</span>
+            </div>
+
+            <div class="feedback-form">
+                <div class="form-section">
+                    <label><i class="bi bi-hand-thumbs-up"></i> What works well?</label>
+                    <textarea class="form-control-custom" rows="3" placeholder="What did you like about this?"></textarea>
+                    <span class="char-count">0 / 500</span>
+                </div>
+
+                <div class="form-section">
+                    <label><i class="bi bi-hand-thumbs-down"></i> What doesn't work?</label>
+                    <textarea class="form-control-custom" rows="3" placeholder="What could be improved?"></textarea>
+                    <span class="char-count">0 / 500</span>
+                </div>
+
+                <div class="form-section">
+                    <label><i class="bi bi-wrench"></i> Suggestions</label>
+                    <textarea class="form-control-custom" rows="3" placeholder="How would you make it better?"></textarea>
+                    <span class="char-count">0 / 500</span>
+                </div>
+
+                <button class="btn btn-purple btn-block">Submit Feedback</button>
+            </div>
+        </div>
+    </div>
+</div>

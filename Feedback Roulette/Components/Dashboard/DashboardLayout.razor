@@ -1,0 +1,80 @@
+@inherits LayoutComponentBase
+
+<div class="dashboard-container">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img style="width: 30px;" src="images/feedback_roulette_logo.png"/>
+                <span>FEEDBACK ROULETTE</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <NavLink ActiveClass="active" href="dashboard" style="text-decoration: none;" Match="NavLinkMatch.All">
+                <div class="nav-item">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </div>
+            </NavLink>
+
+            <NavLink href="review" style="text-decoration: none;">
+                <div class="nav-item">
+                    <i class="bi bi-search"></i>
+                    <span>Review</span>
+                </div>
+            </NavLink>
+
+            <NavLink href="upload" style="text-decoration: none;">
+                <div class="nav-item">
+                    <i class="bi bi-upload"></i>
+                    <span>Upload</span>
+                </div>
+            </NavLink>
+
+            <NavLink href="submissions" style="text-decoration: none;">
+                <div class="nav-item">
+                    <i class="bi bi-folder"></i>
+                    <span>My Submissions</span>
+                </div>
+            </NavLink>
+
+            <NavLink href="feedback-received" style="text-decoration: none;">
+                <div class="nav-item">
+                    <i class="bi bi-chat-left-dots"></i>
+                    <span>Feedback Received</span>
+                </div>
+            </NavLink>
+
+            <NavLink href="leaderboard" style="text-decoration: none;">
+                <div class="nav-item">
+                    <i class="bi bi-trophy"></i>
+                    <span>Leaderboard</span>
+                </div>
+            </NavLink>
+
+            <NavLink href="settings" style="text-decoration: none;">
+                <div class="nav-item">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </div>
+            </NavLink>
+            
+        </nav>
+
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=Marcus+H&background=5D5FEF&color=fff" alt="User Avatar"
+                     class="user-avatar"/>
+                <div class="user-info">
+                    <div class="user-name">Marcus H. <span class="badge-pro">Pro</span></div>
+                    <div class="user-credits">235 credits</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        @Body
+    </main>
+</div>

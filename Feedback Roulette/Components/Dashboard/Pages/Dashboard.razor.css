@@ -1,0 +1,252 @@
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.content-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.notification-btn:hover {
+    color: var(--text-main);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.stat-trend {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.stat-trend.positive {
+    color: var(--accent-green);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.stat-icon.purple { background-color: rgba(93, 95, 239, 0.1); color: var(--primary-purple); }
+.stat-icon.blue { background-color: rgba(60, 145, 241, 0.1); color: #3C91F1; }
+.stat-icon.pink { background-color: rgba(241, 60, 182, 0.1); color: #F13CB6; }
+
+.unlock-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    border: 1px dashed var(--border-color);
+}
+
+.unlock-info {
+    flex: 1;
+    margin-right: 2rem;
+}
+
+.unlock-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.progress-container {
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.progress-bar-custom {
+    height: 100%;
+    background-color: var(--primary-purple);
+    border-radius: 4px;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.feedback-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.feedback-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.feedback-item:hover {
+    transform: translateX(4px);
+    border-color: var(--primary-purple);
+}
+
+.item-preview {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-title {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+
+.item-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.item-stats {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.stat-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mini-value {
+    font-weight: 700;
+}
+
+.mini-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.stat-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.rating-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 3px solid transparent;
+}
+
+.rating-circle.green { border-color: var(--accent-green); color: var(--accent-green); }
+.rating-circle.orange { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+.item-stats i {
+    color: var(--text-muted);
+}

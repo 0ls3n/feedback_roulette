@@ -1,0 +1,114 @@
+@page "/dashboard"
+@layout DashboardLayout
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <div class="welcome">
+            <h1>Welcome back, Marcus 👋</h1>
+            <p class="text-muted-custom">Help others improve and get better feedback in return.</p>
+        </div>
+        <div class="header-actions">
+            <button class="notification-btn">
+                <i class="bi bi-bell"></i>
+            </button>
+            <NavLink href="upload" class="btn btn-purple">Upload</NavLink>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="card-custom stat-card">
+            <div class="stat-info">
+                <span class="stat-label">Credits</span>
+                <span class="stat-value">235</span>
+                <span class="stat-trend positive">+12 this week</span>
+            </div>
+            <div class="stat-icon purple">
+                <i class="bi bi-pentagon"></i>
+            </div>
+        </div>
+        <div class="card-custom stat-card">
+            <div class="stat-info">
+                <span class="stat-label">Feedback Given</span>
+                <span class="stat-value">12</span>
+                <span class="stat-trend">This week</span>
+            </div>
+            <div class="stat-icon blue">
+                <i class="bi bi-chat-right-text"></i>
+            </div>
+        </div>
+        <div class="card-custom stat-card">
+            <div class="stat-info">
+                <span class="stat-label">Feedback Received</span>
+                <span class="stat-value">8</span>
+                <span class="stat-trend">This week</span>
+            </div>
+            <div class="stat-icon pink">
+                <i class="bi bi-chat-dots"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-custom unlock-banner">
+        <div class="unlock-info">
+            <h3>Give 1 more feedback to unlock a new submission</h3>
+            <div class="progress-container">
+                <div class="progress-bar-custom" style="width: 66%;"></div>
+            </div>
+            <span class="progress-text">2 / 3</span>
+        </div>
+        <button class="btn btn-purple">Review Now</button>
+    </div>
+
+    <section class="recent-feedback">
+        <div class="section-header">
+            <h2>Recent Feedback Received</h2>
+            <button class="btn-text">View all</button>
+        </div>
+
+        <div class="feedback-list">
+            <div class="card-custom feedback-item">
+                <div class="item-preview">
+                    <img src="https://picsum.photos/seed/audio1/80/60" alt="Preview" />
+                    <button class="play-btn"><i class="bi bi-play-fill"></i></button>
+                </div>
+                <div class="item-details">
+                    <div class="item-title">The Lost Signal - Mix</div>
+                    <div class="item-meta">Metalcore</div>
+                </div>
+                <div class="item-stats">
+                    <div class="stat-mini">
+                        <span class="mini-value">3</span>
+                        <span class="mini-label">Feedback</span>
+                    </div>
+                    <div class="stat-rating">
+                        <div class="rating-circle green">4.6</div>
+                        <span class="mini-label">Avg. rating</span>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+
+            <div class="card-custom feedback-item">
+                <div class="item-preview">
+                    <img src="https://picsum.photos/seed/code1/80/60" alt="Preview" />
+                    <button class="play-btn"><i class="bi bi-code-slash"></i></button>
+                </div>
+                <div class="item-details">
+                    <div class="item-title">Sorting Algorithm in C#</div>
+                    <div class="item-meta">Programming</div>
+                </div>
+                <div class="item-stats">
+                    <div class="stat-mini">
+                        <span class="mini-value">2</span>
+                        <span class="mini-label">Feedback</span>
+                    </div>
+                    <div class="stat-rating">
+                        <div class="rating-circle orange">3.8</div>
+                        <span class="mini-label">Avg. rating</span>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

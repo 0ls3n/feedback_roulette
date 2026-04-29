@@ -1,0 +1,103 @@
+:root {
+    --bg-dark: #0D0D12;
+    --card-bg: #1C1C24;
+    --sidebar-bg: #0D0D12;
+    --primary-purple: #5D5FEF;
+    --primary-purple-hover: #4B4DDF;
+    --text-main: #FFFFFF;
+    --text-muted: #A0A0A0;
+    --accent-green: #46D39E;
+    --accent-orange: #FF9F43;
+    --accent-red: #FF5C5C;
+    --sidebar-width: 260px;
+    --border-color: #2E2E3A;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.back-link {
+    margin-bottom: 0.5rem;
+}
+
+.back-link a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.dashboard-sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.dashboard-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    background-color: var(--bg-dark);
+}
+
+.card-custom {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.btn-purple {
+    background-color: var(--primary-purple);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-purple:hover {
+    background-color: var(--primary-purple-hover);
+    color: white;
+}
+
+.text-muted-custom {
+    color: var(--text-muted);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3E3E4A;
+}

@@ -1,0 +1,76 @@
+@page "/leaderboard"
+@layout DashboardLayout
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <h1>Leaderboard</h1>
+        <div class="filter-dropdown">
+            <select class="form-control-custom">
+                <option>This week</option>
+                <option>All time</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="leaderboard-container">
+        <div class="user-rank-banner card-custom">
+            <div class="rank-profile">
+                <img src="https://ui-avatars.com/api/?name=Marcus+H&background=5D5FEF&color=fff" alt="User Avatar" class="rank-avatar" />
+                <div class="rank-info">
+                    <h3>Marcus H. <span class="badge-pro">Pro</span></h3>
+                    <p>Level 7 • 1,250 / 2,000 XP</p>
+                </div>
+            </div>
+            <div class="rank-stats">
+                <div class="rank-stat">
+                    <span class="stat-value">142</span>
+                    <span class="stat-label">Reviews Given</span>
+                </div>
+                <div class="rank-stat">
+                    <span class="stat-value">89</span>
+                    <span class="stat-label">Reviews Received</span>
+                </div>
+                <div class="rank-stat">
+                    <span class="stat-value">56</span>
+                    <span class="stat-label">Helpful Votes</span>
+                </div>
+            </div>
+        </div>
+
+        <section class="top-reviewers card-custom">
+            <h3>Top Reviewers</h3>
+            <div class="reviewer-list">
+                <div class="reviewer-item">
+                    <span class="rank-number">1</span>
+                    <img src="https://i.pravatar.cc/150?u=alexm" alt="Avatar" class="reviewer-avatar" />
+                    <span class="reviewer-name">AlexM <span class="badge-pro-mini">Pro</span></span>
+                    <span class="reviewer-score">245</span>
+                </div>
+                <div class="reviewer-item">
+                    <span class="rank-number">2</span>
+                    <img src="https://i.pravatar.cc/150?u=soundwave" alt="Avatar" class="reviewer-avatar" />
+                    <span class="reviewer-name">SoundWave <span class="badge-pro-mini">Pro</span></span>
+                    <span class="reviewer-score">198</span>
+                </div>
+                <div class="reviewer-item">
+                    <span class="rank-number">3</span>
+                    <img src="https://i.pravatar.cc/150?u=codemaster" alt="Avatar" class="reviewer-avatar" />
+                    <span class="reviewer-name">CodeMaster <span class="badge-pro-mini">Pro</span></span>
+                    <span class="reviewer-score">176</span>
+                </div>
+                <div class="reviewer-item current-user">
+                    <span class="rank-number">4</span>
+                    <img src="https://ui-avatars.com/api/?name=Marcus+H&background=5D5FEF&color=fff" alt="Avatar" class="reviewer-avatar" />
+                    <span class="reviewer-name">Marcus H. <span class="user-tag">You</span></span>
+                    <span class="reviewer-score">142</span>
+                </div>
+                <div class="reviewer-item">
+                    <span class="rank-number">5</span>
+                    <img src="https://i.pravatar.cc/150?u=gitguru" alt="Avatar" class="reviewer-avatar" />
+                    <span class="reviewer-name">GitGuru <span class="badge-pro-mini">Pro</span></span>
+                    <span class="reviewer-score">131</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

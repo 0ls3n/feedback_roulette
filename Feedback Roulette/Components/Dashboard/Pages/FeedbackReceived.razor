@@ -1,0 +1,85 @@
+@page "/feedback-received"
+@layout DashboardLayout
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <div class="back-link">
+            <a href="/dashboard"><i class="bi bi-arrow-left"></i> Feedback Received</a>
+        </div>
+        <h1>The Lost Signal - Mix</h1>
+    </header>
+
+    <div class="feedback-received-grid">
+        <div class="main-column">
+            <div class="card-custom player-preview-card">
+                 <div class="item-preview-large">
+                    <button class="play-btn-large"><i class="bi bi-play-fill"></i></button>
+                    <div class="item-info-large">
+                        <h3>The Lost Signal - Mix</h3>
+                        <span>Metalcore</span>
+                    </div>
+                </div>
+                <div class="rating-badge-large">
+                    <span class="rating-value">4.6</span>
+                    <span class="rating-label">Average rating based on 3 reviews</span>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <button class="tab">All Feedback (3)</button>
+                <button class="tab">Comments</button>
+                <button class="tab">Ratings</button>
+                <button class="tab active">Summary</button>
+            </div>
+
+            <section class="feedback-summary">
+                <div class="summary-content">
+                    <h3>Feedback Summary</h3>
+                    <p class="ai-note">AI detected patterns from the feedback you received.</p>
+                    
+                    <ul class="pattern-list">
+                        <li>
+                            <i class="bi bi-hand-thumbs-down pattern-icon orange"></i>
+                            <div>
+                                <strong>Low end is a common issue</strong>
+                                <p>2 people mentioned muddy or unclear bass.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="bi bi-hand-thumbs-up pattern-icon green"></i>
+                            <div>
+                                <strong>Drums are powerful</strong>
+                                <p>3 people liked the punch and energy.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="bi bi-lightbulb pattern-icon purple"></i>
+                            <div>
+                                <strong>Vocals could be clearer</strong>
+                                <p>2 people suggested more clarity in vocals.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="summary-chart">
+                    <div class="donut-container">
+                        <svg width="160" height="160" viewBox="0 0 160 160">
+                            <circle cx="80" cy="80" r="70" fill="transparent" stroke="#2E2E3A" stroke-width="20" />
+                            <circle cx="80" cy="80" r="70" fill="transparent" stroke="#46D39E" stroke-width="20" stroke-dasharray="250 440" stroke-dashoffset="0" />
+                            <circle cx="80" cy="80" r="70" fill="transparent" stroke="#FF9F43" stroke-width="20" stroke-dasharray="120 440" stroke-dashoffset="-250" />
+                            <circle cx="80" cy="80" r="70" fill="transparent" stroke="#5D5FEF" stroke-width="20" stroke-dasharray="70 440" stroke-dashoffset="-370" />
+                            <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24" font-weight="700" fill="white">7</text>
+                            <text x="50%" y="65%" text-anchor="middle" font-size="10" fill="#A0A0A0">Total feedback</text>
+                        </svg>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="dot green"></span> Positive <span class="percent">57%</span></div>
+                        <div class="legend-item"><span class="dot orange"></span> Negative <span class="percent">29%</span></div>
+                        <div class="legend-item"><span class="dot purple"></span> Suggestions <span class="percent">14%</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
