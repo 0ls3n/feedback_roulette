@@ -57,6 +57,21 @@ namespace Feedback_Roulette.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: true),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -167,6 +182,68 @@ namespace Feedback_Roulette.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "FeedbackItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "varchar(255)", nullable: true),
+                    FileUrl = table.Column<string>(type: "longtext", nullable: true),
+                    FileType = table.Column<string>(type: "longtext", nullable: true),
+                    FileSize = table.Column<string>(type: "longtext", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FeedbackItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FeedbackItems_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FeedbackItems_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Feedbacks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    ApplicationUserId = table.Column<string>(type: "varchar(255)", nullable: true),
+                    HasPositiveFeedback = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    HasNegativeFeedback = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    HasSuggestion = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PositiveFeedback = table.Column<string>(type: "longtext", nullable: true),
+                    NegativeFeedback = table.Column<string>(type: "longtext", nullable: true),
+                    Suggestion = table.Column<string>(type: "longtext", nullable: true),
+                    FeedbackItemId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Feedbacks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Feedbacks_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Feedbacks_FeedbackItems_FeedbackItemId",
+                        column: x => x.FeedbackItemId,
+                        principalTable: "FeedbackItems",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -203,6 +280,26 @@ namespace Feedback_Roulette.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FeedbackItems_ApplicationUserId",
+                table: "FeedbackItems",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FeedbackItems_CategoryId",
+                table: "FeedbackItems",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Feedbacks_ApplicationUserId",
+                table: "Feedbacks",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Feedbacks_FeedbackItemId",
+                table: "Feedbacks",
+                column: "FeedbackItemId");
         }
 
         /// <inheritdoc />
@@ -224,10 +321,19 @@ namespace Feedback_Roulette.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Feedbacks");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "FeedbackItems");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
         }
     }
 }

@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feedback Roulette", "Feedback Roulette\Feedback Roulette.csproj", "{81CA7380-F62F-42E5-9E5B-6E12E84ACBC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedbackRoulette_ClassLibrary", "FeedbackRoulette_ClassLibrary\FeedbackRoulette_ClassLibrary.csproj", "{2F518415-17FC-40DC-95B1-F83DC7497632}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{81CA7380-F62F-42E5-9E5B-6E12E84ACBC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81CA7380-F62F-42E5-9E5B-6E12E84ACBC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81CA7380-F62F-42E5-9E5B-6E12E84ACBC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F518415-17FC-40DC-95B1-F83DC7497632}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F518415-17FC-40DC-95B1-F83DC7497632}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F518415-17FC-40DC-95B1-F83DC7497632}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F518415-17FC-40DC-95B1-F83DC7497632}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

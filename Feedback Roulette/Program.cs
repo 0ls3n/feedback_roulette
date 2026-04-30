@@ -1,5 +1,6 @@
 using Feedback_Roulette.Components;
 using Feedback_Roulette.Data;
+using FeedbackRoulette_ClassLibrary;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity;

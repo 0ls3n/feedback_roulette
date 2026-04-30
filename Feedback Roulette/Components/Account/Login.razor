@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
 @using Feedback_Roulette.Data
+@using FeedbackRoulette_ClassLibrary
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
@@ -76,6 +77,9 @@
 @code {
     [SupplyParameterFromForm]
     private LoginInput Input { get; set; } = new();
+    
+    [SupplyParameterFromQuery]
+    public string ReturnUrl { get; set; }
 
     private bool isSubmitting = false;
     private string? errorMessage;
@@ -99,7 +103,14 @@
 
         if (result.Succeeded)
         {
-            NavigationManager.NavigateTo("dashboard");
+            if (ReturnUrl != null)
+            {
+                NavigationManager.NavigateTo(ReturnUrl);
+            }
+            else
+            {
+                NavigationManager.NavigateTo("dashboard");
+            }
         }
         else if (result.IsLockedOut)
         {

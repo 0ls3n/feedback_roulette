@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Feedback_Roulette.Data;
+namespace FeedbackRoulette_ClassLibrary;
 
 public class ApplicationUser : IdentityUser
 {

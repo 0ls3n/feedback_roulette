@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Roulette.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260429201040_InitialCreate")]
+    [Migration("20260430103446_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,7 +22,7 @@ namespace Feedback_Roulette.Migrations
                 .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Feedback_Roulette.Data.ApplicationUser", b =>
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -84,6 +84,100 @@ namespace Feedback_Roulette.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("FeedbackItemId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasNegativeFeedback")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("HasPositiveFeedback")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("HasSuggestion")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("NegativeFeedback")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PositiveFeedback")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Suggestion")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("FeedbackItemId");
+
+                    b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.FeedbackItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FileSize")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FileType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FileUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("FeedbackItems");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -214,6 +308,36 @@ namespace Feedback_Roulette.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.Feedback", b =>
+                {
+                    b.HasOne("FeedbackRoulette_ClassLibrary.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("FeedbackRoulette_ClassLibrary.FeedbackItem", null)
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("FeedbackItemId");
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.FeedbackItem", b =>
+                {
+                    b.HasOne("FeedbackRoulette_ClassLibrary.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("FeedbackRoulette_ClassLibrary.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -225,7 +349,7 @@ namespace Feedback_Roulette.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Feedback_Roulette.Data.ApplicationUser", null)
+                    b.HasOne("FeedbackRoulette_ClassLibrary.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -234,7 +358,7 @@ namespace Feedback_Roulette.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Feedback_Roulette.Data.ApplicationUser", null)
+                    b.HasOne("FeedbackRoulette_ClassLibrary.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -249,7 +373,7 @@ namespace Feedback_Roulette.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Feedback_Roulette.Data.ApplicationUser", null)
+                    b.HasOne("FeedbackRoulette_ClassLibrary.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -258,11 +382,16 @@ namespace Feedback_Roulette.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Feedback_Roulette.Data.ApplicationUser", null)
+                    b.HasOne("FeedbackRoulette_ClassLibrary.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FeedbackRoulette_ClassLibrary.FeedbackItem", b =>
+                {
+                    b.Navigation("Feedbacks");
                 });
 #pragma warning restore 612, 618
         }
