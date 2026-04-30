@@ -1,8 +1,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using FeedbackRoulette_ClassLibrary
 @inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
 
 
 <div class="dashboard-container">
@@ -92,7 +95,7 @@
                              class="user-avatar"/>
                         <div class="user-info">
                             <div class="user-name">@context.User.Identity.Name<span class="badge-pro">Pro</span></div>
-                            <div class="user-credits">235 credits</div>
+                            <div class="user-credits">@(currentUser?.Credits ?? 0) credits</div>
                         </div>
                     </div>
                 </div>
@@ -106,5 +109,26 @@
 </div>
 
 @code {
-    
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    private ApplicationUser? currentUser;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthStateTask != null)
+        {
+            var authState = await AuthStateTask;
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (userId != null)
+                {
+                    currentUser = await UserManager.FindByIdAsync(userId);
+                }
+            }
+        }
+    }
 }

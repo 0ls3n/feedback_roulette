@@ -4,7 +4,6 @@ using Feedback_Roulette.Services;
 using FeedbackRoulette_ClassLibrary;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +12,13 @@ builder.Services.AddRazorComponents()
 
 var connectionString = builder.Configuration.GetConnectionString("DbConnection") ?? throw new InvalidOperationException("Connection string 'DbConnection' not found.");;
 
-builder.Services.AddDbContext<DataContext>(options =>
+builder.Services.AddDbContextFactory<DataContext>(options =>
     options.UseMySQL(connectionString));
+
+builder.Services.AddScoped(p => 
+    p.GetRequiredService<IDbContextFactory<DataContext>>().CreateDbContext());
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -30,7 +34,7 @@ builder.Services
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-builder.Services.AddTransient<IIdentityService, IdentityService>();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
 
 builder.Services.AddCascadingAuthenticationState();
 

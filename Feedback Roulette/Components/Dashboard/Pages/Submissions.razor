@@ -2,7 +2,155 @@
 @layout DashboardLayout
 @attribute [Authorize]
 
+@using Feedback_Roulette.Data
+@using Feedback_Roulette.Services
+@using FeedbackRoulette_ClassLibrary
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<DataContext> DbFactory
+@inject IIdentityService IdentityService
+@inject NavigationManager NavigationManager
+
 <div class="dashboard-content">
-    <h1>My Submissions</h1>
-    <p class="text-muted-custom">Coming soon...</p>
+    <header class="content-header">
+        <div class="welcome">
+            <h1>My Submissions</h1>
+            <p class="text-muted-custom">Manage your work and check for new feedback.</p>
+        </div>
+        <div class="header-actions">
+            <NavLink href="upload" class="btn btn-purple">
+                <i class="bi bi-plus-lg"></i> New Submission
+            </NavLink>
+        </div>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-purple" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Fetching your submissions...</p>
+        </div>
+    }
+    else if (!mySubmissions.Any())
+    {
+        <div class="empty-state card-custom">
+            <i class="bi bi-folder2-open"></i>
+            <h3>No submissions yet</h3>
+            <p>Upload your first work to start receiving feedback from the community.</p>
+            <NavLink href="upload" class="btn btn-purple">Upload Now</NavLink>
+        </div>
+    }
+    else
+    {
+        <div class="submissions-list">
+            @foreach (var item in mySubmissions)
+            {
+                <div class="card-custom submission-item" @onclick="() => ViewFeedback(item.Id)">
+                    <div class="item-type-icon @(item.Category.Name?.ToLower())">
+                        @if (item.Category.Name == "Music")
+                        {
+                            <i class="bi bi-music-note-beamed"></i>
+                        }
+                        else if (item.Category.Name == "Programming")
+                        {
+                            <i class="bi bi-code-slash"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-file-earmark-text"></i>
+                        }
+                    </div>
+                    
+                    <div class="item-details">
+                        <div class="item-title-row">
+                            <h3 class="item-title">@item.Title</h3>
+                            <span class="category-tag">@item.Category.Name</span>
+                        </div>
+                        <div class="item-meta">
+                            <span>Uploaded on @DateTime.Now.ToShortDateString()</span>
+                            <span class="dot-separator">•</span>
+                            <span>@item.FileSize</span>
+                        </div>
+                    </div>
+
+                    <div class="item-stats">
+                        <div class="stat-group">
+                            <span class="stat-value">@item.Feedbacks.Count</span>
+                            <span class="stat-label">Reviews</span>
+                        </div>
+                        
+                        <div class="stat-group">
+                            @if (item.Feedbacks.Any())
+                            {
+                                <div class="rating-indicator">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>4.5</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="no-rating">No rating</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="item-actions">
+                        <button class="btn-icon" title="Edit"><i class="bi bi-pencil"></i></button>
+                        <button class="btn-icon text-danger" title="Delete" @onclick:stopPropagation="true" @onclick="() => DeleteItem(item)"><i class="bi bi-trash"></i></button>
+                        <i class="bi bi-chevron-right arrow-icon"></i>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
+
+@code {
+    private List<FeedbackItem> mySubmissions = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubmissions();
+    }
+
+    private async Task LoadSubmissions()
+    {
+        isLoading = true;
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+            using var context = DbFactory.CreateDbContext();
+            mySubmissions = await context.FeedbackItems
+                .Include(i => i.Category)
+                .Include(i => i.Feedbacks)
+                .Where(i => i.ApplicationUserId == user.Id)
+                .OrderByDescending(i => i.Id)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading submissions: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ViewFeedback(int itemId)
+    {
+        NavigationManager.NavigateTo($"/feedback-received/{itemId}");
+    }
+
+    private async Task DeleteItem(FeedbackItem item)
+    {
+        // In a real app, add confirmation
+        using var context = DbFactory.CreateDbContext();
+        context.FeedbackItems.Remove(item);
+        await context.SaveChangesAsync();
+        await LoadSubmissions();
+    }
+}

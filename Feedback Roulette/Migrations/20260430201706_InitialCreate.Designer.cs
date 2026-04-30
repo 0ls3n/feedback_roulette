@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Roulette.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260430103446_InitialCreate")]
+    [Migration("20260430201706_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,6 +33,9 @@ namespace Feedback_Roulette.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Credits")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -112,7 +115,7 @@ namespace Feedback_Roulette.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int?>("FeedbackItemId")
+                    b.Property<int>("FeedbackItemId")
                         .HasColumnType("int");
 
                     b.Property<bool>("HasNegativeFeedback")
@@ -314,11 +317,15 @@ namespace Feedback_Roulette.Migrations
                         .WithMany()
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("FeedbackRoulette_ClassLibrary.FeedbackItem", null)
+                    b.HasOne("FeedbackRoulette_ClassLibrary.FeedbackItem", "FeedbackItem")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("FeedbackItemId");
+                        .HasForeignKey("FeedbackItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("FeedbackItem");
                 });
 
             modelBuilder.Entity("FeedbackRoulette_ClassLibrary.FeedbackItem", b =>

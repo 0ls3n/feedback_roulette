@@ -9,6 +9,9 @@ public class Feedback
     public string? ApplicationUserId { get; set; }
     public ApplicationUser ApplicationUser { get; set; }
     
+    public int FeedbackItemId { get; set; }
+    public FeedbackItem FeedbackItem { get; set; }
+    
     public bool HasPositiveFeedback { get; set; }
     public bool HasNegativeFeedback { get; set; }
     public bool HasSuggestion { get; set; }

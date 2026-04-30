@@ -15,4 +15,15 @@ public class DataContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Entity<Category>().HasData(
+            new Category { Id = 1, Name = "Music", Description = "Songwriting, mixing, mastering, and performance." },
+            new Category { Id = 2, Name = "Programming", Description = "Code reviews, architecture, and logic." },
+            new Category { Id = 3, Name = "Design", Description = "UI/UX, graphic design, and branding." }
+        );
+    }
 }

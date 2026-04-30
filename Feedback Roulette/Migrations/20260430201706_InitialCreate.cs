@@ -35,6 +35,7 @@ namespace Feedback_Roulette.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
+                    Credits = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
@@ -220,13 +221,13 @@ namespace Feedback_Roulette.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     ApplicationUserId = table.Column<string>(type: "varchar(255)", nullable: true),
+                    FeedbackItemId = table.Column<int>(type: "int", nullable: false),
                     HasPositiveFeedback = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     HasNegativeFeedback = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     HasSuggestion = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     PositiveFeedback = table.Column<string>(type: "longtext", nullable: true),
                     NegativeFeedback = table.Column<string>(type: "longtext", nullable: true),
-                    Suggestion = table.Column<string>(type: "longtext", nullable: true),
-                    FeedbackItemId = table.Column<int>(type: "int", nullable: true)
+                    Suggestion = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -240,7 +241,8 @@ namespace Feedback_Roulette.Migrations
                         name: "FK_Feedbacks_FeedbackItems_FeedbackItemId",
                         column: x => x.FeedbackItemId,
                         principalTable: "FeedbackItems",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 

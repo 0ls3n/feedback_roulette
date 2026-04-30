@@ -2,6 +2,20 @@
 @layout DashboardLayout
 @attribute [Authorize]
 
+@using Feedback_Roulette.Data
+@using Feedback_Roulette.Services
+@using FeedbackRoulette_ClassLibrary
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject IWebHostEnvironment Environment
+@inject IDbContextFactory<DataContext> DbFactory
+@inject IIdentityService IdentityService
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+
+@rendermode InteractiveServer
+
 <div class="dashboard-content">
     <header class="content-header">
         <div class="back-link">
@@ -11,39 +25,182 @@
     </header>
 
     <div class="upload-container card-custom">
-        <div class="drop-zone">
+        <div class="drop-zone @(isDragOver ? "drag-over" : "")" 
+             @ondragenter="HandleDragEnter" 
+             @ondragleave="HandleDragLeave" 
+             @ondragover="HandleDragOver">
+            
+            <InputFile OnChange="LoadFiles" 
+                       accept=".mp3, .wav" 
+                       class="file-input-overlay" />
+            
             <div class="drop-content">
-                <i class="bi bi-cloud-upload"></i>
-                <h3>Drag & drop your file here</h3>
-                <p>or <button class="btn-link">click to browse</button></p>
-                <span class="file-types">MP3, WAV, MP4, ZIP, C#, JS, etc. (max 200MB)</span>
+                @if (selectedFile == null)
+                {
+                    <i class="bi bi-cloud-upload"></i>
+                    <h3>Drag & drop your file here</h3>
+                    <p>or <span class="btn-link">click to browse</span></p>
+                    <span class="file-types">MP3, WAV (max 200MB)</span>
+                }
+                else
+                {
+                    <i class="bi bi-file-earmark-music"></i>
+                    <h3>@selectedFile.Name</h3>
+                    <p>Size: @((selectedFile.Size / 1024.0 / 1024.0).ToString("F2")) MB</p>
+                    <span class="btn-link">Change file</span>
+                }
             </div>
+        </div>
+
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control-custom" @bind="submissionTitle" placeholder="Give your work a name" />
         </div>
 
         <div class="form-grid">
             <div class="form-group">
                 <label>Category</label>
-                <select class="form-control-custom">
-                    <option>Music</option>
-                    <option>Programming</option>
-                    <option>Design</option>
+                <select class="form-control-custom" @bind="selectedCategoryId">
+                    <option value="0" disabled>Select Category</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
                 </select>
             </div>
             <div class="form-group">
                 <label>Genre / Language</label>
-                <select class="form-control-custom">
-                    <option>Metalcore</option>
-                    <option>C#</option>
-                    <option>UI Design</option>
-                </select>
+                <input type="text" class="form-control-custom" @bind="genre" placeholder="e.g. Metalcore, C#, UI Design" />
             </div>
         </div>
 
         <div class="form-group">
             <label>What do you want feedback on?</label>
-            <textarea class="form-control-custom" rows="4" placeholder="E.g. Mix quality, Drums, Vocals, Code structure..."></textarea>
+            <textarea class="form-control-custom" rows="4" @bind="feedbackDescription" placeholder="E.g. Mix quality, Drums, Vocals, Code structure..."></textarea>
         </div>
 
-        <button class="btn btn-purple btn-block">Upload Submission</button>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mb-3">
+                @errorMessage
+            </div>
+        }
+
+        <button class="btn btn-purple btn-block" @onclick="HandleUpload" disabled="@(isUploading || selectedFile == null || string.IsNullOrWhiteSpace(submissionTitle) || selectedCategoryId == 0)">
+            @if (isUploading)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span> Uploading...</span>
+            }
+            else
+            {
+                <span>Upload Submission (50 Credits)</span>
+            }
+        </button>
     </div>
 </div>
+
+@code {
+    private List<Category> categories = new();
+    private int selectedCategoryId;
+    private string submissionTitle = "";
+    private string genre = "";
+    private string feedbackDescription = "";
+    private string? errorMessage;
+    
+    private IBrowserFile? selectedFile;
+    private int maxFileSize = 1024 * 1024 * 200; // 200MB
+
+    private bool isUploading = false;
+    private bool isDragOver = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        categories = await context.Categories.ToListAsync();
+        if (categories.Any())
+        {
+            selectedCategoryId = categories.First().Id;
+        }
+    }
+
+    private void HandleDragEnter() => isDragOver = true;
+    private void HandleDragLeave() => isDragOver = false;
+    private void HandleDragOver() => isDragOver = true;
+
+    private void LoadFiles(InputFileChangeEventArgs e)
+    {
+        isDragOver = false;
+        selectedFile = e.File;
+        errorMessage = null;
+        StateHasChanged();
+    }
+
+    private async Task HandleUpload()
+    {
+        if (selectedFile == null || string.IsNullOrWhiteSpace(submissionTitle) || selectedCategoryId == 0) return;
+        
+        isUploading = true;
+        errorMessage = null;
+        StateHasChanged();
+        
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+
+            if (user.Credits < 50)
+            {
+                errorMessage = "You don't have enough credits to upload a new submission. Give some feedback to earn more!";
+                isUploading = false;
+                return;
+            }
+            
+            var trustedFileName = Path.GetRandomFileName() + Path.GetExtension(selectedFile.Name);
+            var uploadPath = Path.Combine(Environment.WebRootPath, "uploads");
+            
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
+
+            var filePath = Path.Combine(uploadPath, trustedFileName);
+
+            await using (FileStream fs = new(filePath, FileMode.Create))
+            {
+                await selectedFile.OpenReadStream(maxFileSize).CopyToAsync(fs);
+            }
+
+            var feedbackItem = new FeedbackItem
+            {
+                Title = submissionTitle,
+                Description = $"{genre}\n\n{feedbackDescription}".Trim(),
+                ApplicationUserId = user.Id,
+                CategoryId = selectedCategoryId,
+                FileUrl = $"/uploads/{trustedFileName}",
+                FileType = selectedFile.ContentType,
+                FileSize = (selectedFile.Size / 1024.0 / 1024.0).ToString("F2") + " MB",
+                Feedbacks = new List<Feedback>()
+            };
+
+            using var context = DbFactory.CreateDbContext();
+            context.FeedbackItems.Add(feedbackItem);
+            
+            // Deduct credits
+            user.Credits -= 50;
+            await UserManager.UpdateAsync(user);
+            
+            await context.SaveChangesAsync();
+            
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error uploading file: {ex.Message}";
+        }
+        finally
+        {
+            isUploading = false;
+            StateHasChanged();
+        }
+    }
+}

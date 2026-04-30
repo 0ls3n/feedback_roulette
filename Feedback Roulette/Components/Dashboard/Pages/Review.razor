@@ -1,58 +1,239 @@
 @page "/review"
 @layout DashboardLayout
 @attribute [Authorize]
+@rendermode InteractiveServer
+
+@using Feedback_Roulette.Data
+@using Feedback_Roulette.Services
+@using FeedbackRoulette_ClassLibrary
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+
+@inject IDbContextFactory<DataContext> DbFactory
+@inject IIdentityService IdentityService
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
 
 <div class="dashboard-content">
     <header class="content-header">
         <div class="back-link">
-            <a href="/dashboard"><i class="bi bi-arrow-left"></i> Review #47321</a>
+            <a href="/dashboard"><i class="bi bi-arrow-left"></i> Dashboard</a>
         </div>
-        <button class="btn-skip">Skip</button>
+        @if (currentItem != null)
+        {
+            <button class="btn-skip" @onclick="LoadRandomItem">Skip</button>
+        }
     </header>
 
-    <div class="review-grid">
-        <div class="review-main card-custom">
-            <div class="content-info">
-                <span class="category-tag">Music / Metalcore</span>
-                <h2>Beyond The Chaos - Final Mix</h2>
-                <span class="author">by JohnD</span>
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-purple" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-
-            <div class="player-container">
-                <button class="play-main"><i class="bi bi-play-fill"></i></button>
-                <div class="waveform">
-                    <div class="wave-bar" style="height: 40%;"></div>
-                    <div class="wave-bar" style="height: 60%;"></div>
-                    <div class="wave-bar" style="height: 80%;"></div>
-                    <div class="wave-bar active" style="height: 100%;"></div>
-                    <div class="wave-bar" style="height: 70%;"></div>
-                    <div class="wave-bar" style="height: 50%;"></div>
-                    <!-- More bars... -->
-                </div>
-                <span class="duration">3:45</span>
-            </div>
-
-            <div class="feedback-form">
-                <div class="form-section">
-                    <label><i class="bi bi-hand-thumbs-up"></i> What works well?</label>
-                    <textarea class="form-control-custom" rows="3" placeholder="What did you like about this?"></textarea>
-                    <span class="char-count">0 / 500</span>
-                </div>
-
-                <div class="form-section">
-                    <label><i class="bi bi-hand-thumbs-down"></i> What doesn't work?</label>
-                    <textarea class="form-control-custom" rows="3" placeholder="What could be improved?"></textarea>
-                    <span class="char-count">0 / 500</span>
+            <p>Finding a submission for you to review...</p>
+        </div>
+    }
+    else if (currentItem == null)
+    {
+        <div class="empty-state card-custom">
+            <i class="bi bi-emoji-smile"></i>
+            <h3>You're all caught up!</h3>
+            <p>You have reviewed all available submissions or there are no new submissions yet. Check back later or upload your own work!</p>
+            <NavLink href="upload" class="btn btn-purple">Upload New Work</NavLink>
+        </div>
+    }
+    else
+    {
+        <div class="review-grid">
+            <div class="review-main card-custom">
+                <div class="content-info">
+                    <span class="category-tag">@currentItem.Category.Name</span>
+                    <h2>@currentItem.Title</h2>
+                    <span class="author">by @currentItem.ApplicationUser.UserName</span>
                 </div>
 
-                <div class="form-section">
-                    <label><i class="bi bi-wrench"></i> Suggestions</label>
-                    <textarea class="form-control-custom" rows="3" placeholder="How would you make it better?"></textarea>
-                    <span class="char-count">0 / 500</span>
+                <div class="player-container">
+                    <div class="audio-player-wrapper">
+                        @if (currentItem.FileType?.StartsWith("audio") == true)
+                        {
+                            <audio controls class="custom-audio-element">
+                                <source src="@currentItem.FileUrl" type="@currentItem.FileType">
+                                Your browser does not support the audio element.
+                            </audio>
+                        }
+                        else
+                        {
+                            <div class="file-link-card">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <a href="@currentItem.FileUrl" target="_blank" class="btn btn-outline-purple">View / Download File</a>
+                            </div>
+                        }
+                    </div>
                 </div>
 
-                <button class="btn btn-purple btn-block">Submit Feedback</button>
+                <div class="description-box">
+                    <h4>Description & Context</h4>
+                    <p>@currentItem.Description</p>
+                </div>
+
+                <div class="feedback-form">
+                    <div class="form-section">
+                        <label><i class="bi bi-hand-thumbs-up"></i> What works well?</label>
+                        <textarea class="form-control-custom" rows="3" @bind="positiveFeedback" placeholder="What did you like about this?"></textarea>
+                        <span class="char-count">@positiveFeedback.Length / 500</span>
+                    </div>
+
+                    <div class="form-section">
+                        <label><i class="bi bi-hand-thumbs-down"></i> What doesn't work?</label>
+                        <textarea class="form-control-custom" rows="3" @bind="negativeFeedback" placeholder="What could be improved?"></textarea>
+                        <span class="char-count">@negativeFeedback.Length / 500</span>
+                    </div>
+
+                    <div class="form-section">
+                        <label><i class="bi bi-wrench"></i> Suggestions</label>
+                        <textarea class="form-control-custom" rows="3" @bind="suggestion" placeholder="How would you make it better?"></textarea>
+                        <span class="char-count">@suggestion.Length / 500</span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mb-3">@errorMessage</div>
+                    }
+
+                    <button class="btn btn-purple btn-block" @onclick="SubmitFeedback" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm"></span>
+                            <span> Submitting...</span>
+                        }
+                        else
+                        {
+                            <span>Submit Feedback (+10 Credits)</span>
+                        }
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    }
 </div>
+
+@code {
+    private FeedbackItem? currentItem;
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+    private string positiveFeedback = "";
+    private string negativeFeedback = "";
+    private string suggestion = "";
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRandomItem();
+    }
+
+    private async Task LoadRandomItem()
+    {
+        isLoading = true;
+        errorMessage = null;
+        positiveFeedback = "";
+        negativeFeedback = "";
+        suggestion = "";
+        StateHasChanged();
+
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+            
+            using var context = DbFactory.CreateDbContext();
+
+            // Get IDs of items already reviewed by this user
+            var reviewedItemIds = await context.Feedbacks
+                .Where(f => f.ApplicationUserId == user.Id)
+                .Select(f => f.FeedbackItemId)
+                .ToListAsync();
+
+            // Find a random item not owned by user and not yet reviewed
+            var availableItems = await context.FeedbackItems
+                .Include(i => i.Category)
+                .Include(i => i.ApplicationUser)
+                .Where(i => i.ApplicationUserId != user.Id && !reviewedItemIds.Contains(i.Id))
+                .ToListAsync();
+
+            if (availableItems.Any())
+            {
+                var random = new Random();
+                currentItem = availableItems[random.Next(availableItems.Count)];
+            }
+            else
+            {
+                currentItem = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading random item: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitFeedback()
+    {
+        if (currentItem == null) return;
+        
+        if (string.IsNullOrWhiteSpace(positiveFeedback) && 
+            string.IsNullOrWhiteSpace(negativeFeedback) && 
+            string.IsNullOrWhiteSpace(suggestion))
+        {
+            errorMessage = "Please provide some feedback before submitting.";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+            
+            using var context = DbFactory.CreateDbContext();
+
+            var feedback = new Feedback
+            {
+                ApplicationUserId = user.Id,
+                FeedbackItemId = currentItem.Id,
+                HasPositiveFeedback = !string.IsNullOrWhiteSpace(positiveFeedback),
+                HasNegativeFeedback = !string.IsNullOrWhiteSpace(negativeFeedback),
+                HasSuggestion = !string.IsNullOrWhiteSpace(suggestion),
+                PositiveFeedback = positiveFeedback,
+                NegativeFeedback = negativeFeedback,
+                Suggestion = suggestion
+            };
+
+            context.Feedbacks.Add(feedback);
+            
+            // Reward credits
+            user.Credits += 10;
+            await UserManager.UpdateAsync(user);
+            
+            await context.SaveChangesAsync();
+            
+            // Success! Load next item
+            await LoadRandomItem();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error submitting feedback: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+}

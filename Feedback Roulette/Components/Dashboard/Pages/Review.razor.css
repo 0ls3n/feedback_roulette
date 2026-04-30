@@ -42,47 +42,75 @@
 .player-container {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 2.5rem;
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
 
-.play-main {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: var(--primary-purple);
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.audio-player-wrapper {
+    width: 100%;
+    max-width: 600px;
 }
 
-.waveform {
-    flex: 1;
+.custom-audio-element {
+    width: 100%;
     height: 40px;
+}
+
+/* For non-audio files */
+.file-link-card {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 1.5rem;
+    padding: 1rem;
 }
 
-.wave-bar {
-    flex: 1;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
+.file-link-card i {
+    font-size: 3.5rem;
+    color: var(--primary-purple);
 }
 
-.wave-bar.active {
+.btn-outline-purple {
+    border: 1.5px solid var(--primary-purple);
+    color: var(--primary-purple);
+    background: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-outline-purple:hover {
     background-color: var(--primary-purple);
+    color: white;
 }
 
-.duration {
-    font-size: 0.85rem;
+.description-box {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.description-box h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.description-box p {
+    margin: 0;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: #E0E0E0;
 }
 
 .form-section {

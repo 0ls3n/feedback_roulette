@@ -4,5 +4,5 @@ namespace FeedbackRoulette_ClassLibrary;
 
 public class ApplicationUser : IdentityUser
 {
-    // Custom fields here
+    public int Credits { get; set; } = 100; // Default credits for new users
 }

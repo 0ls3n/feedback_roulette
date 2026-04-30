@@ -1,23 +1,27 @@
 using System.Security.Claims;
 using FeedbackRoulette_ClassLibrary;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace Feedback_Roulette.Services;
 
 public class IdentityService :  IIdentityService
 {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AuthenticationStateProvider _authStateProvider;
         private readonly UserManager<ApplicationUser> _userManager;
     
-        public IdentityService(IHttpContextAccessor httpContextAccessor,  UserManager<ApplicationUser> userManager)
+        public IdentityService(AuthenticationStateProvider authStateProvider,  UserManager<ApplicationUser> userManager)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _authStateProvider = authStateProvider;
             _userManager = userManager;
         }
         
         public async Task<ApplicationUser> GetCurrentUserAsync()
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var authState = await _authStateProvider.GetAuthenticationStateAsync();
+            var userPrincipal = authState.User;
+            
+            var userId = userPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 throw new Exception("User not found");

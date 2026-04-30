@@ -1,23 +1,32 @@
 @page "/dashboard"
 @using System.Security.Principal
+@using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
+@using Microsoft.EntityFrameworkCore
 @layout DashboardLayout
 @attribute [Authorize]
 @rendermode InteractiveServer
 
 @inject IIdentityService IdentityService
+@inject IDbContextFactory<DataContext> DbFactory
+@inject NavigationManager NavigationManager
 
-@if (isLoading)
-{
-    <span>Loading...</span>
-}
-else
-{
-    <div class="dashboard-content">
+<div class="dashboard-content">
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-purple" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading your dashboard...</p>
+        </div>
+    }
+    else
+    {
         <header class="content-header">
             <div class="welcome">
-                <h1>Welcome back, @currentUser.UserName 👋</h1>
+                <h1>Welcome back, @currentUser?.UserName 👋</h1>
                 <p class="text-muted-custom">Help others improve and get better feedback in return.</p>
             </div>
             <div class="header-actions">
@@ -32,8 +41,8 @@ else
             <div class="card-custom stat-card">
                 <div class="stat-info">
                     <span class="stat-label">Credits</span>
-                    <span class="stat-value">235</span>
-                    <span class="stat-trend positive">+12 this week</span>
+                    <span class="stat-value">@(currentUser?.Credits ?? 0)</span>
+                    <span class="stat-trend positive">Available</span>
                 </div>
                 <div class="stat-icon purple">
                     <i class="bi bi-pentagon"></i>
@@ -42,8 +51,8 @@ else
             <div class="card-custom stat-card">
                 <div class="stat-info">
                     <span class="stat-label">Feedback Given</span>
-                    <span class="stat-value">12</span>
-                    <span class="stat-trend">This week</span>
+                    <span class="stat-value">@feedbackGivenCount</span>
+                    <span class="stat-trend">Total</span>
                 </div>
                 <div class="stat-icon blue">
                     <i class="bi bi-chat-right-text"></i>
@@ -52,8 +61,8 @@ else
             <div class="card-custom stat-card">
                 <div class="stat-info">
                     <span class="stat-label">Feedback Received</span>
-                    <span class="stat-value">8</span>
-                    <span class="stat-trend">This week</span>
+                    <span class="stat-value">@feedbackReceivedCount</span>
+                    <span class="stat-trend">Total</span>
                 </div>
                 <div class="stat-icon pink">
                     <i class="bi bi-chat-dots"></i>
@@ -63,88 +72,133 @@ else
 
         <div class="card-custom unlock-banner">
             <div class="unlock-info">
-                <h3>Give 1 more feedback to unlock a new submission</h3>
+                <h3>Give @(Math.Max(0, 3 - feedbackGivenCount % 3)) more feedback to unlock a new submission</h3>
                 <div class="progress-container">
-                    <div class="progress-bar-custom" style="width: 66%;"></div>
+                    <div class="progress-bar-custom" style="width: @((feedbackGivenCount % 3) * 33.33)%;"></div>
                 </div>
-                <span class="progress-text">2 / 3</span>
+                <span class="progress-text">@(feedbackGivenCount % 3) / 3</span>
             </div>
-            <button class="btn btn-purple">Review Now</button>
+            <button class="btn btn-purple" @onclick='() => NavigationManager.NavigateTo("/review")'>Review Now</button>
         </div>
 
         <section class="recent-feedback">
             <div class="section-header">
-                <h2>Recent Feedback Received</h2>
-                <button class="btn-text">View all</button>
+                <h2>Your Recent Submissions</h2>
+                <button class="btn-text" @onclick='() => NavigationManager.NavigateTo("/submissions")'>View all</button>
             </div>
 
             <div class="feedback-list">
-                <div class="card-custom feedback-item">
-                    <div class="item-preview">
-                        <img src="https://picsum.photos/seed/audio1/80/60" alt="Preview"/>
-                        <button class="play-btn"><i class="bi bi-play-fill"></i></button>
+                @if (!recentSubmissions.Any())
+                {
+                    <div class="empty-state-small">
+                        <p>No submissions yet.
+                            <NavLink href="upload">Upload something</NavLink>
+                            to start!
+                        </p>
                     </div>
-                    <div class="item-details">
-                        <div class="item-title">The Lost Signal - Mix</div>
-                        <div class="item-meta">Metalcore</div>
-                    </div>
-                    <div class="item-stats">
-                        <div class="stat-mini">
-                            <span class="mini-value">3</span>
-                            <span class="mini-label">Feedback</span>
+                }
+                else
+                {
+                    @foreach (var item in recentSubmissions)
+                    {
+                        <div class="card-custom feedback-item"
+                             @onclick='() => NavigationManager.NavigateTo($"/feedback-received")'>
+                            <div class="item-preview">
+                                @if (item.Category.Name == "Music")
+                                {
+                                    <div class="placeholder-icon music"><i class="bi bi-music-note-beamed"></i></div>
+                                }
+                                else if (item.Category.Name == "Programming")
+                                {
+                                    <div class="placeholder-icon code"><i class="bi bi-code-slash"></i></div>
+                                }
+                                else
+                                {
+                                    <div class="placeholder-icon generic"><i class="bi bi-file-earmark-text"></i></div>
+                                }
+                                <button class="play-btn"><i class="bi bi-play-fill"></i></button>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">@item.Title</div>
+                                <div class="item-meta">@item.Category.Name</div>
+                            </div>
+                            <div class="item-stats">
+                                <div class="stat-mini">
+                                    <span class="mini-value">@item.Feedbacks.Count</span>
+                                    <span class="mini-label">Feedback</span>
+                                </div>
+                                @if (item.Feedbacks.Any())
+                                {
+                                    <div class="stat-rating">
+                                        <div class="rating-circle green">4.5</div>
+                                        <span class="mini-label">Avg. rating</span>
+                                    </div>
+                                }
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
                         </div>
-                        <div class="stat-rating">
-                            <div class="rating-circle green">4.6</div>
-                            <span class="mini-label">Avg. rating</span>
-                        </div>
-                        <i class="bi bi-chevron-right"></i>
-                    </div>
-                </div>
-
-                <div class="card-custom feedback-item">
-                    <div class="item-preview">
-                        <img src="https://picsum.photos/seed/code1/80/60" alt="Preview"/>
-                        <button class="play-btn"><i class="bi bi-code-slash"></i></button>
-                    </div>
-                    <div class="item-details">
-                        <div class="item-title">Sorting Algorithm in C#</div>
-                        <div class="item-meta">Programming</div>
-                    </div>
-                    <div class="item-stats">
-                        <div class="stat-mini">
-                            <span class="mini-value">2</span>
-                            <span class="mini-label">Feedback</span>
-                        </div>
-                        <div class="stat-rating">
-                            <div class="rating-circle orange">3.8</div>
-                            <span class="mini-label">Avg. rating</span>
-                        </div>
-                        <i class="bi bi-chevron-right"></i>
-                    </div>
-                </div>
+                    }
+                }
             </div>
         </section>
-    </div>
-}
+    }
+</div>
 
 @code {
-
-    bool isLoading = true;
-
+    private bool isLoading = true;
     private ApplicationUser? currentUser;
+    private int feedbackGivenCount = 0;
+    private int feedbackReceivedCount = 0;
+    private List<FeedbackItem> recentSubmissions = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
-        isLoading = true;
-
         if (firstRender)
         {
-            currentUser = await IdentityService.GetCurrentUserAsync();
+            await LoadDashboardData();
         }
+    }
 
-        isLoading = false;
+    private async Task LoadDashboardData()
+    {
+        isLoading = true;
         StateHasChanged();
+
+        try
+        {
+            currentUser = await IdentityService.GetCurrentUserAsync();
+
+            using var context = DbFactory.CreateDbContext();
+            
+            // Get stats
+            feedbackGivenCount = await context.Feedbacks
+                .CountAsync(f => f.ApplicationUserId == currentUser.Id);
+
+            var mySubmissions = await context.FeedbackItems
+                .Include(i => i.Feedbacks)
+                .Where(i => i.ApplicationUserId == currentUser.Id)
+                .ToListAsync();
+
+            feedbackReceivedCount = mySubmissions.Sum(i => i.Feedbacks.Count);
+
+            // Get recent submissions
+            recentSubmissions = await context.FeedbackItems
+                .Include(i => i.Category)
+                .Include(i => i.Feedbacks)
+                .Where(i => i.ApplicationUserId == currentUser.Id)
+                .OrderByDescending(i => i.Id)
+                .Take(3)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading dashboard data: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
 }

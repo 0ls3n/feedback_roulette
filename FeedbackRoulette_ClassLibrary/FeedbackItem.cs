@@ -19,7 +19,7 @@ public class FeedbackItem
     public string? FileSize { get; set; }
     
     public int CategoryId { get; set; }
-    public required Category Category { get; set; }
+    public Category Category { get; set; }
     
     public List<Feedback> Feedbacks { get; set; }
 }
