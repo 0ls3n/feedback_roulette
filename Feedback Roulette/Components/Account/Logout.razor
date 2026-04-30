@@ -1,0 +1,24 @@
+@page "/Account/Logout"
+@using Microsoft.AspNetCore.Identity
+@using FeedbackRoulette_ClassLibrary
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // if (HttpMethods.IsPost(HttpContext.Request.Method))
+        // {
+        //     
+        // }
+        
+        await SignInManager.SignOutAsync();
+        NavigationManager.NavigateTo(ReturnUrl ?? "/");
+    }
+}

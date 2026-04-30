@@ -1,5 +1,6 @@
 using Feedback_Roulette.Components;
 using Feedback_Roulette.Data;
+using Feedback_Roulette.Services;
 using FeedbackRoulette_ClassLibrary;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,8 @@ builder.Services
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
+builder.Services.AddTransient<IIdentityService, IdentityService>();
 
 builder.Services.AddCascadingAuthenticationState();
 

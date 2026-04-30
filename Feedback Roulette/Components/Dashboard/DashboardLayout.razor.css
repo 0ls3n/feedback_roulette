@@ -99,6 +99,33 @@ a.active .nav-item {
     box-shadow: 0 0 10px var(--primary-purple);
 }
 
+.sidebar-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 0.5rem 1.25rem;
+}
+
+.logout-button {
+    width: calc(100% - 1.5rem);
+    margin: 0 0.75rem;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 0.9rem 1.25rem;
+}
+
+.logout-button:hover i {
+    color: #ff4d4d !important;
+}
+
+.logout-button:hover span {
+    color: #ff4d4d !important;
+}
+
 .sidebar-footer {
     padding: 1.5rem;
     margin: 1rem;

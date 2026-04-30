@@ -1,5 +1,8 @@
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
 
 
 <div class="dashboard-container">
@@ -60,23 +63,48 @@
                     <span>Settings</span>
                 </div>
             </NavLink>
-            
+
+            <div class="sidebar-divider"></div>
+
+            <AuthorizeView>
+                <Authorized>
+                    <a style="text-decoration: none;" href="/Account/Logout">
+                        <AntiforgeryToken />
+                        <button type="submit" class="nav-item logout-button">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sign Out</span>
+                        </button>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+
         </nav>
 
-
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <img src="https://ui-avatars.com/api/?name=Marcus+H&background=5D5FEF&color=fff" alt="User Avatar"
-                     class="user-avatar"/>
-                <div class="user-info">
-                    <div class="user-name">Marcus H. <span class="badge-pro">Pro</span></div>
-                    <div class="user-credits">235 credits</div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="sidebar-footer">
+                    <div class="user-profile">
+                        @{
+                            string profileSrc = $"https://ui-avatars.com/api/?name={context.User.Identity.Name}&background=5D5FEF&color=fff";
+                        }
+                        <img src="@profileSrc"
+                             alt="User Avatar"
+                             class="user-avatar"/>
+                        <div class="user-info">
+                            <div class="user-name">@context.User.Identity.Name<span class="badge-pro">Pro</span></div>
+                            <div class="user-credits">235 credits</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </Authorized>
+        </AuthorizeView>
     </aside>
 
     <main class="dashboard-main">
         @Body
     </main>
 </div>
+
+@code {
+    
+}

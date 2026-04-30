@@ -7,6 +7,7 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
 
+
 <PageTitle>Login - Feedback Roulette</PageTitle>
 
 <div class="auth-container">
@@ -30,7 +31,7 @@
             <div class="form-group">
                 <label for="email">Email or Username</label>
                 <div class="input-wrapper">
-                    <i class="bi bi-envelope"></i>
+                    
                     <InputText id="email" @bind-Value="Input.Email" class="form-control" placeholder="name@example.com" />
                 </div>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
@@ -42,7 +43,7 @@
                     <a href="Account/ForgotPassword" class="forgot-link">Forgot?</a>
                 </div>
                 <div class="input-wrapper">
-                    <i class="bi bi-lock"></i>
+                    
                     <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" placeholder="••••••••" />
                 </div>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
