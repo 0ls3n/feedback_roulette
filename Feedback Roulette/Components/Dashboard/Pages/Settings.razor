@@ -127,9 +127,14 @@
 @code {
     private ApplicationUser? currentUser;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        currentUser = await IdentityService.GetCurrentUserAsync();
+        if (firstRender)
+        {
+            currentUser = await IdentityService.GetCurrentUserAsync();
+            
+            StateHasChanged();
+        }
     }
 
     private async Task SaveChanges()

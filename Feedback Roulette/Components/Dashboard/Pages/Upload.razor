@@ -1,6 +1,7 @@
 @page "/upload"
 @layout DashboardLayout
 @attribute [Authorize]
+@implements IDisposable
 
 @using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
@@ -13,6 +14,7 @@
 @inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JS
 
 @rendermode InteractiveServer
 
@@ -25,14 +27,10 @@
     </header>
 
     <div class="upload-container card-custom">
-        <div class="drop-zone @(isDragOver ? "drag-over" : "")" 
-             @ondragenter="HandleDragEnter" 
-             @ondragleave="HandleDragLeave" 
-             @ondragover="HandleDragOver">
+        <div class="drop-zone @(isDragOver ? "drag-over" : "")">
             
-            <InputFile OnChange="LoadFiles" 
-                       accept=".mp3, .wav" 
-                       class="file-input-overlay" />
+            <InputFile id="file-upload-input" OnChange="LoadFiles" accept=".mp3, .wav"
+                       style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; z-index: 2;" />
             
             <div class="drop-content">
                 @if (selectedFile == null)
@@ -113,6 +111,7 @@
 
     private bool isUploading = false;
     private bool isDragOver = false;
+    private DotNetObjectReference<Upload>? dotNetRef;
 
     protected override async Task OnInitializedAsync()
     {
@@ -124,9 +123,26 @@
         }
     }
 
-    private void HandleDragEnter() => isDragOver = true;
-    private void HandleDragLeave() => isDragOver = false;
-    private void HandleDragOver() => isDragOver = true;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initFileUpload", dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void SetDragOver(bool value)
+    {
+        isDragOver = value;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        dotNetRef?.Dispose();
+    }
 
     private void LoadFiles(InputFileChangeEventArgs e)
     {
