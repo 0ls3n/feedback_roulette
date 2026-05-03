@@ -2,6 +2,8 @@
 @layout DashboardLayout
 @attribute [Authorize]
 
+@rendermode InteractiveServer
+
 @using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
@@ -111,9 +113,13 @@
     private List<FeedbackItem> mySubmissions = new();
     private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadSubmissions();
+        if (firstRender)
+        {
+            await LoadSubmissions();
+            StateHasChanged();
+        }
     }
 
     private async Task LoadSubmissions()

@@ -13,22 +13,22 @@
         <div class="sidebar-header">
             <div class="logo">
                 <img style="width: 30px;" src="images/feedback_roulette_logo.png"/>
-                <span>FEEDBACK ROULETTE</span>
+                <span>FEEDBACK <br/>ROULETTE</span>
             </div>
         </div>
 
         <nav class="sidebar-nav">
+            <NavLink href="review" style="text-decoration: none;" ActiveClass="active" Match="NavLinkMatch.All">
+                <div class="nav-item review-item">
+                    <i class="bi bi-shuffle"></i>
+                    <span style="color: white;">Review</span>
+                </div>
+            </NavLink>
+
             <NavLink ActiveClass="active" href="dashboard" style="text-decoration: none;" Match="NavLinkMatch.All">
                 <div class="nav-item">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
-                </div>
-            </NavLink>
-
-            <NavLink href="review" style="text-decoration: none;">
-                <div class="nav-item">
-                    <i class="bi bi-search"></i>
-                    <span>Review</span>
                 </div>
             </NavLink>
 

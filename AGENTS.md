@@ -88,10 +88,19 @@ Feedback Roulette.sln
 - Component-specific styles via `.razor.css` isolation
 - Bootstrap 5 + Bootstrap Icons for utilities
 
+### Sidebar
+- **Collapsible**: Folds to 64px (icons only) by default, expands to 260px on hover
+- **Transitions**: `0.3s cubic-bezier(0.4, 0, 0.2, 1)` on width, padding, and text reveal
+- **Review item**: Primary action with purple gradient background, placed at top of nav
+- **Icon positioning**: Centered when folded, left-aligned when expanded
+- **Profile footer**: Transparent when folded, card background with avatar border on hover
+- CSS controlled via `:hover` on `.dashboard-sidebar` — no JS required
+
 ### Navigation
 - Use `NavLink` for internal links (auto `active` class)
 - Sidebar nav defined in `DashboardLayout.razor`
-- Routes: `/dashboard`, `/review`, `/upload`, `/submissions`, `/feedback-received`, `/leaderboard`, `/settings`
+- Review is the primary page (first nav item, highlighted with gradient)
+- Routes: `/review`, `/dashboard`, `/upload`, `/submissions`, `/feedback-received`, `/leaderboard`, `/settings`
 
 ### Authentication
 - Identity with email/password, no account confirmation required

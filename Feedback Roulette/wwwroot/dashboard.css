@@ -10,6 +10,7 @@
     --accent-orange: #FF9F43;
     --accent-red: #FF5C5C;
     --sidebar-width: 260px;
+    --sidebar-collapsed-width: 85px;
     --border-color: #2E2E3A;
 }
 
@@ -34,6 +35,10 @@ body {
     gap: 0.5rem;
 }
 
+.content-header {
+    margin-bottom: 1rem;
+}
+
 
 .dashboard-container {
     display: flex;
@@ -41,7 +46,7 @@ body {
 }
 
 .dashboard-sidebar {
-    width: var(--sidebar-width);
+    width: var(--sidebar-collapsed-width);
     background-color: var(--sidebar-bg);
     border-right: 1px solid var(--border-color);
     display: flex;
@@ -49,13 +54,24 @@ body {
     position: fixed;
     height: 100vh;
     z-index: 100;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.dashboard-sidebar:hover {
+    width: var(--sidebar-width);
 }
 
 .dashboard-main {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    margin-left: var(--sidebar-collapsed-width);
     padding: 2rem;
     background-color: var(--bg-dark);
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-sidebar:hover ~ .dashboard-main {
+    margin-left: var(--sidebar-width);
 }
 
 .card-custom {
