@@ -1,9 +1,12 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 @using FeedbackRoulette_ClassLibrary
+@using Feedback_Roulette.Services
 
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject INotificationService NotificationService
+@inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
 
@@ -19,10 +22,64 @@
         <div class="navbar-actions">
             <AuthorizeView>
                 <Authorized>
-                    <div class="user-profile-nav">
-                        <a href="dashboard" class="profile-link">
-                            <img src="@(avatarSrc ?? $"https://ui-avatars.com/api/?name={context.User.Identity?.Name ?? "User"}&background=5D5FEF&color=fff")" alt="Profile" class="nav-avatar"/>
-                        </a>
+                    <div class="navbar-icons">
+                        <div class="notification-bell-container">
+                            <button class="notification-bell-btn" @onclick="ToggleNotificationDropdown">
+                                <i class="bi bi-bell"></i>
+                                @if (unreadCount > 0)
+                                {
+                                    <span class="notification-badge"></span>
+                                }
+                            </button>
+
+                            @if (showNotifications)
+                            {
+                                <div class="notification-dropdown">
+                                    <div class="notification-header">
+                                        <h6>Notifications</h6>
+                                        @if (notifications.Any(n => !n.IsRead))
+                                        {
+                                            <button class="mark-all-read-btn" @onclick="MarkAllAsRead">
+                                                Mark all read
+                                            </button>
+                                        }
+                                    </div>
+
+                                    <div class="notification-list">
+                                        @if (notifications.Count == 0)
+                                        {
+                                            <div class="no-notifications">
+                                                <i class="bi bi-bell-slash"></i>
+                                                <p>No notifications yet</p>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            foreach (var notification in notifications)
+                                            {
+                                                <div class="notification-item @(notification.IsRead ? "read" : "unread")"
+                                                     @onclick="() => HandleNotificationClick(notification)">
+                                                    <div class="notification-content">
+                                                        <p>@notification.Message</p>
+                                                        <small>@notification.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                                    </div>
+                                                    @if (!notification.IsRead)
+                                                    {
+                                                        <div class="unread-indicator"></div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="user-profile-nav">
+                            <a href="dashboard" class="profile-link">
+                                <img src="@(avatarSrc ?? $"https://ui-avatars.com/api/?name={context.User.Identity?.Name ?? "User"}&background=5D5FEF&color=fff")" alt="Profile" class="nav-avatar"/>
+                            </a>
+                        </div>
                     </div>
                 </Authorized>
                 <NotAuthorized>
@@ -38,6 +95,9 @@
 
 @code {
     private string? avatarSrc;
+    private List<Notification> notifications = new();
+    private int unreadCount = 0;
+    private bool showNotifications = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -53,10 +113,58 @@
                 {
                     var appUser = await UserManager.FindByIdAsync(userId);
                     avatarSrc = appUser?.ProfileImageUrl;
+                    
+                    await LoadNotifications(userId);
                     StateHasChanged();
                 }
             }
         }
+    }
+
+    private async Task LoadNotifications(string userId)
+    {
+        notifications = await NotificationService.GetAllNotificationsAsync(userId);
+        unreadCount = await NotificationService.GetUnreadCountAsync(userId);
+    }
+
+    private void ToggleNotificationDropdown()
+    {
+        showNotifications = !showNotifications;
+    }
+
+    private async Task MarkAllAsRead()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = UserManager.GetUserId(authState.User);
+        
+        if (!string.IsNullOrEmpty(userId))
+        {
+            await NotificationService.MarkAllAsReadAsync(userId);
+            await LoadNotifications(userId);
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleNotificationClick(Notification notification)
+    {
+        if (!notification.IsRead)
+        {
+            await NotificationService.MarkAsReadAsync(notification.Id);
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = UserManager.GetUserId(authState.User);
+            
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await LoadNotifications(userId);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(notification.Link))
+        {
+            NavigationManager.NavigateTo(notification.Link);
+        }
+
+        showNotifications = false;
     }
 }
 

@@ -15,6 +15,7 @@
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject IJSRuntime JSRuntime
+@inject INotificationService NotificationService
 
 <div class="dashboard-content">
     <header class="content-header">
@@ -242,6 +243,18 @@
             await UserManager.UpdateAsync(user);
             
             await context.SaveChangesAsync();
+
+            // Create notification for the owner of the feedback item
+            if (currentItem != null)
+            {
+                var itemOwnerId = currentItem.ApplicationUserId;
+                if (!string.IsNullOrEmpty(itemOwnerId))
+                {
+                    var notificationMessage = $"New feedback received on your submission '{currentItem.Title}'";
+                    var notificationLink = $"/feedback-received/{currentItem.Id}";
+                    await NotificationService.CreateNotificationAsync(itemOwnerId, notificationMessage, notificationLink);
+                }
+            }
             
             // Success! Load next item
             await LoadRandomItem();

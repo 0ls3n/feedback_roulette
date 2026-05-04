@@ -35,6 +35,7 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddCascadingAuthenticationState();
 
