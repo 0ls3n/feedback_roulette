@@ -3,19 +3,18 @@
 @attribute [Authorize]
 @rendermode InteractiveServer
 
-@using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
-@using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.JSInterop
 
-@inject IDbContextFactory<DataContext> DbFactory
 @inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject IJSRuntime JSRuntime
 @inject INotificationService NotificationService
+@inject IFeedbackItemService FeedbackItemService
+@inject IFeedbackService FeedbackService
 
 <div class="dashboard-content">
     <header class="content-header">
@@ -157,20 +156,8 @@
         {
             var user = await IdentityService.GetCurrentUserAsync();
             
-            using var context = DbFactory.CreateDbContext();
-
-            // Get IDs of items already reviewed by this user
-            var reviewedItemIds = await context.Feedbacks
-                .Where(f => f.ApplicationUserId == user.Id)
-                .Select(f => f.FeedbackItemId)
-                .ToListAsync();
-
-            // Find a random item not owned by user and not yet reviewed
-            var availableItems = await context.FeedbackItems
-                .Include(i => i.Category)
-                .Include(i => i.ApplicationUser)
-                .Where(i => i.ApplicationUserId != user.Id && !reviewedItemIds.Contains(i.Id))
-                .ToListAsync();
+            // Get available items for review using service
+            var availableItems = await FeedbackItemService.GetAvailableItemsForReviewAsync(user.Id);
 
             if (availableItems.Any())
             {
@@ -222,39 +209,14 @@
         {
             var user = await IdentityService.GetCurrentUserAsync();
             
-            using var context = DbFactory.CreateDbContext();
-
-            var feedback = new Feedback
-            {
-                ApplicationUserId = user.Id,
-                FeedbackItemId = currentItem.Id,
-                HasPositiveFeedback = !string.IsNullOrWhiteSpace(positiveFeedback),
-                HasNegativeFeedback = !string.IsNullOrWhiteSpace(negativeFeedback),
-                HasSuggestion = !string.IsNullOrWhiteSpace(suggestion),
-                PositiveFeedback = positiveFeedback,
-                NegativeFeedback = negativeFeedback,
-                Suggestion = suggestion
-            };
-
-            context.Feedbacks.Add(feedback);
-            
-            // Reward credits
-            user.Credits += 10;
-            await UserManager.UpdateAsync(user);
-            
-            await context.SaveChangesAsync();
-
-            // Create notification for the owner of the feedback item
-            if (currentItem != null)
-            {
-                var itemOwnerId = currentItem.ApplicationUserId;
-                if (!string.IsNullOrEmpty(itemOwnerId))
-                {
-                    var notificationMessage = $"New feedback received on your submission '{currentItem.Title}'";
-                    var notificationLink = $"/feedback-received/{currentItem.Id}";
-                    await NotificationService.CreateNotificationAsync(itemOwnerId, notificationMessage, notificationLink);
-                }
-            }
+            // Submit feedback using service (handles credits, notification, etc.)
+            await FeedbackService.SubmitFeedbackAsync(
+                user.Id,
+                currentItem.Id,
+                positiveFeedback,
+                negativeFeedback,
+                suggestion
+            );
             
             // Success! Load next item
             await LoadRandomItem();

@@ -36,6 +36,10 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFeedbackItemService, FeedbackItemService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddCascadingAuthenticationState();
 

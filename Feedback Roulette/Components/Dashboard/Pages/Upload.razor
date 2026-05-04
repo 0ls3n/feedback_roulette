@@ -3,18 +3,18 @@
 @attribute [Authorize]
 @implements IDisposable
 
-@using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
 
 @inject IWebHostEnvironment Environment
-@inject IDbContextFactory<DataContext> DbFactory
 @inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject IJSRuntime JS
+@inject IFeedbackItemService FeedbackItemService
+@inject IUserSettingsService UserSettingsService
+@inject ICategoryService CategoryService
 
 @rendermode InteractiveServer
 
@@ -115,8 +115,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        categories = await context.Categories.ToListAsync();
+        categories = await CategoryService.GetCategoriesAsync();
         if (categories.Any())
         {
             selectedCategoryId = categories.First().Id;
@@ -164,7 +163,8 @@
         {
             var user = await IdentityService.GetCurrentUserAsync();
 
-            if (user.Credits < 50)
+            // Check if user has enough credits
+            if (!await UserSettingsService.HasEnoughCreditsAsync(user.Id, 50))
             {
                 errorMessage = "You don't have enough credits to upload a new submission. Give some feedback to earn more!";
                 isUploading = false;
@@ -186,26 +186,16 @@
                 await selectedFile.OpenReadStream(maxFileSize).CopyToAsync(fs);
             }
 
-            var feedbackItem = new FeedbackItem
-            {
-                Title = submissionTitle,
-                Description = $"{genre}\n\n{feedbackDescription}".Trim(),
-                ApplicationUserId = user.Id,
-                CategoryId = selectedCategoryId,
-                FileUrl = $"/uploads/{user.Id}/submissions/{trustedFileName}",
-                FileType = selectedFile.ContentType,
-                FileSize = (selectedFile.Size / 1024.0 / 1024.0).ToString("F2") + " MB",
-                Feedbacks = new List<Feedback>()
-            };
-
-            using var context = DbFactory.CreateDbContext();
-            context.FeedbackItems.Add(feedbackItem);
-            
-            // Deduct credits
-            user.Credits -= 50;
-            await UserManager.UpdateAsync(user);
-            
-            await context.SaveChangesAsync();
+            // Create submission using service
+            await FeedbackItemService.CreateSubmissionAsync(
+                user.Id,
+                submissionTitle,
+                selectedCategoryId,
+                $"{genre}\n\n{feedbackDescription}".Trim(),
+                $"/uploads/{user.Id}/submissions/{trustedFileName}",
+                selectedFile.ContentType,
+                (selectedFile.Size / 1024.0 / 1024.0).ToString("F2") + " MB"
+            );
             
             NavigationManager.NavigateTo("/dashboard");
         }

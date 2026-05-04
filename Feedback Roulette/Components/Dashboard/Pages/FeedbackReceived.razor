@@ -4,13 +4,11 @@
 @attribute [Authorize]
 @rendermode InteractiveServer
 
-@using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
-@using Microsoft.EntityFrameworkCore
 
-@inject IDbContextFactory<DataContext> DbFactory
 @inject IIdentityService IdentityService
+@inject IFeedbackItemService FeedbackItemService
 
 @if (ItemId.HasValue)
 {
@@ -345,26 +343,16 @@ else
         try
         {
             var user = await IdentityService.GetCurrentUserAsync();
-            using var context = DbFactory.CreateDbContext();
 
             if (ItemId.HasValue)
             {
                 // Just load the specific item
-                item = await context.FeedbackItems
-                    .Include(i => i.Category)
-                    .Include(i => i.Feedbacks)
-                    .FirstOrDefaultAsync(i => i.Id == ItemId && i.ApplicationUserId == user.Id);
+                item = await FeedbackItemService.GetSubmissionByIdAsync(ItemId.Value, user.Id);
             }
             else
             {
                 // Load all submissions with feedback for the sidebar
-                submissionsWithFeedback = await context.FeedbackItems
-                    .Include(i => i.Category)
-                    .Include(i => i.Feedbacks)
-                    .Where(i => i.ApplicationUserId == user.Id && i.Feedbacks.Any())
-                    .OrderByDescending(i => i.Feedbacks.Max(f => f.Id))
-                    .ToListAsync();
-
+                submissionsWithFeedback = await FeedbackItemService.GetSubmissionsWithFeedbackAsync(user.Id);
                 item = submissionsWithFeedback.FirstOrDefault();
             }
         }

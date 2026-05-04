@@ -40,7 +40,17 @@ Feedback Roulette.sln
 │   │   └── DataContext.cs              # EF Core DbContext
 │   ├── Services/
 │   │   ├── IIdentityService.cs
-│   │   └── IdentityService.cs          # Get current user helper
+│   │   ├── IdentityService.cs          # Get current user helper
+│   │   ├── INotificationService.cs
+│   │   ├── NotificationService.cs      # Notification management
+│   │   ├── IFeedbackItemService.cs
+│   │   ├── FeedbackItemService.cs      # Submission CRUD operations
+│   │   ├── IFeedbackService.cs
+│   │   ├── FeedbackService.cs          # Feedback submission & retrieval
+│   │   ├── IUserSettingsService.cs
+│   │   ├── UserSettingsService.cs      # User profile operations
+│   │   ├── ICategoryService.cs
+│   │   └── CategoryService.cs         # Category loading
 │   ├── wwwroot/
 │   │   ├── app.css                     # Global app styles
 │   │   ├── dashboard.css               # Dashboard theme (CSS vars)
@@ -124,6 +134,21 @@ Feedback Roulette.sln
 - MySQL primary (connection in `appsettings.json`)
 - `DataContext` extends `IdentityDbContext<ApplicationUser>`
 - Registered as scoped via `IDbContextFactory`
+- **Service layer pattern**: All database operations moved to services:
+  - `NotificationService` - Creates/manages notifications (bell icon in navbar/dashboard)
+  - `FeedbackItemService` - CRUD operations for submissions
+  - `FeedbackService` - Feedback submission (auto-creates notifications) & retrieval
+  - `UserSettingsService` - Profile image updates, credit checks
+  - `CategoryService` - Load categories
+
+### Notifications
+- Notification bell in **TopNavbar** (all pages) and **Dashboard header**
+- Red badge dot appears when unread notifications exist
+- Dropdown shows notifications; "No notifications yet" when empty
+- "Mark all read" button to clear unread status
+- Clicking notification marks it read and navigates to linked page
+- **Auto-created when feedback is submitted** - owner of feedback item gets notified
+- `Notification` model: `Id`, `ApplicationUserId`, `Message`, `IsRead`, `CreatedAt`, `Link`
 
 ## Development
 
@@ -131,3 +156,6 @@ Feedback Roulette.sln
 - **Migrations:** Use `dotnet ef migrations add` from "Feedback Roulette/"
 - **Adding pages:** Place in `Components/Dashboard/Pages/` for authenticated, `Components/Pages/` for public
 - **Adding styles:** Use CSS vars in `dashboard.css` for globals, `.razor.css` for component-specific
+- **Service pattern:** All database operations should go through services (e.g., `IFeedbackItemService`, `INotificationService`)
+  - Register new services in `Program.cs`
+  - Inject services into components instead of `IDbContextFactory` or `DataContext`

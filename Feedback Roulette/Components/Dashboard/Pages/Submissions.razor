@@ -4,14 +4,12 @@
 
 @rendermode InteractiveServer
 
-@using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
-@using Microsoft.EntityFrameworkCore
 
-@inject IDbContextFactory<DataContext> DbFactory
 @inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
+@inject IFeedbackItemService FeedbackItemService
 
 <div class="dashboard-content">
     <header class="content-header">
@@ -154,13 +152,7 @@
         try
         {
             var user = await IdentityService.GetCurrentUserAsync();
-            using var context = DbFactory.CreateDbContext();
-            mySubmissions = await context.FeedbackItems
-                .Include(i => i.Category)
-                .Include(i => i.Feedbacks)
-                .Where(i => i.ApplicationUserId == user.Id)
-                .OrderByDescending(i => i.Id)
-                .ToListAsync();
+            mySubmissions = await FeedbackItemService.GetUserSubmissionsAsync(user.Id);
         }
         catch (Exception ex)
         {
@@ -180,9 +172,8 @@
     private async Task ConfirmDelete()
     {
         if (itemToDelete == null) return;
-        using var context = DbFactory.CreateDbContext();
-        context.FeedbackItems.Remove(itemToDelete);
-        await context.SaveChangesAsync();
+        var user = await IdentityService.GetCurrentUserAsync();
+        await FeedbackItemService.DeleteSubmissionAsync(itemToDelete.Id, user.Id);
         await CloseModalAndReset();
         await LoadSubmissions();
     }

@@ -3,7 +3,6 @@
 @attribute [Authorize]
 @rendermode InteractiveServer
 
-@using Feedback_Roulette.Data
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
 @using Microsoft.AspNetCore.Identity
@@ -11,8 +10,8 @@
 
 @inject IIdentityService IdentityService
 @inject UserManager<ApplicationUser> UserManager
-@inject DataContext DbContext
 @inject IWebHostEnvironment Environment
+@inject IUserSettingsService UserSettingsService
 
 <div class="dashboard-content">
     <header class="content-header">
@@ -177,9 +176,9 @@
                 await file.OpenReadStream(maxImageSize).CopyToAsync(fs);
             }
 
-            user.ProfileImageUrl = $"/uploads/{user.Id}/profile/{trustedFileName}";
-            await UserManager.UpdateAsync(user);
-            currentUser = user;
+            var profileImageUrl = $"/uploads/{user.Id}/profile/{trustedFileName}";
+            await UserSettingsService.UpdateProfileImageAsync(user.Id, profileImageUrl);
+            currentUser = await UserSettingsService.GetCurrentUserAsync(user.Id);
 
             StateHasChanged();
         }
