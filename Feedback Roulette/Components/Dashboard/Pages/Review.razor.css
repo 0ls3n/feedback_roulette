@@ -42,7 +42,7 @@
 .player-container {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
-    padding: 2.5rem;
+    padding: 1.5rem 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,12 +51,97 @@
 
 .audio-player-wrapper {
     width: 100%;
-    max-width: 600px;
 }
 
-.custom-audio-element {
+/* Waveform Player */
+.waveform-player {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+}
+
+.waveform-play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5D5FEF, #7B7DFF);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.waveform-play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(93, 95, 239, 0.4);
+}
+
+.waveform-play-btn i {
+    font-size: 1.5rem;
+    color: white;
+    position: absolute;
+    transition: opacity 0.2s;
+}
+
+.waveform-play-btn .bi-pause-fill {
+    opacity: 0;
+}
+
+.waveform-play-btn.playing .bi-play-fill {
+    opacity: 0;
+}
+
+.waveform-play-btn.playing .bi-pause-fill {
+    opacity: 1;
+}
+
+.waveform-visual {
+    flex: 1;
+    position: relative;
+    height: 60px;
+    background: rgba(93, 95, 239, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.waveform-canvas {
     width: 100%;
-    height: 40px;
+    height: calc(100% - 4px);
+    display: block;
+}
+
+.waveform-transport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: calc(100% - 4px);
+    background: #5D5FEF;
+    pointer-events: none;
+    box-shadow: 0 0 6px rgba(93, 95, 239, 0.6);
+}
+
+.waveform-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+.waveform-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #5D5FEF;
 }
 
 /* For non-audio files */

@@ -5,20 +5,9 @@
 @inject NavigationManager NavigationManager
 
 @code {
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
-
-    [SupplyParameterFromQuery]
-    private string? ReturnUrl { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        // if (HttpMethods.IsPost(HttpContext.Request.Method))
-        // {
-        //     
-        // }
-        
         await SignInManager.SignOutAsync();
-        NavigationManager.NavigateTo(ReturnUrl ?? "/");
+        NavigationManager.NavigateTo("/", forceLoad: true);
     }
 }

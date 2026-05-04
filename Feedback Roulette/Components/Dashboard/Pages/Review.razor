@@ -8,11 +8,13 @@
 @using FeedbackRoulette_ClassLibrary
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
 
 @inject IDbContextFactory<DataContext> DbFactory
 @inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JSRuntime
 
 <div class="dashboard-content">
     <header class="content-header">
@@ -57,10 +59,19 @@
                     <div class="audio-player-wrapper">
                         @if (currentItem.FileType?.StartsWith("audio") == true)
                         {
-                            <audio controls class="custom-audio-element">
-                                <source src="@currentItem.FileUrl" type="@currentItem.FileType">
-                                Your browser does not support the audio element.
-                            </audio>
+                            <div id="waveform-player-@currentItem.Id" class="waveform-player">
+                                <button class="waveform-play-btn" type="button">
+                                    <i class="bi bi-play-fill"></i>
+                                    <i class="bi bi-pause-fill"></i>
+                                </button>
+                                <div class="waveform-visual">
+                                    <canvas class="waveform-canvas" width="600" height="80"></canvas>
+                                    <div class="waveform-transport"></div>
+                                    <div class="waveform-progress">
+                                        <div class="waveform-progress-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
                         }
                         else
                         {
@@ -178,6 +189,15 @@
         {
             isLoading = false;
             StateHasChanged();
+            await InitializeWaveformPlayer();
+        }
+    }
+
+    private async Task InitializeWaveformPlayer()
+    {
+        if (currentItem?.FileType?.StartsWith("audio") == true)
+        {
+            await JSRuntime.InvokeVoidAsync("waveformPlayer.init", $"waveform-player-{currentItem.Id}", currentItem.FileUrl);
         }
     }
 

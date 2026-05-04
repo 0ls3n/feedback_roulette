@@ -64,7 +64,7 @@
                             <i class="bi bi-file-earmark-text"></i>
                         }
                     </div>
-                    
+
                     <div class="item-details">
                         <div class="item-title-row">
                             <h3 class="item-title">@item.Title</h3>
@@ -82,7 +82,7 @@
                             <span class="stat-value">@item.Feedbacks.Count</span>
                             <span class="stat-label">Reviews</span>
                         </div>
-                        
+
                         <div class="stat-group">
                             @if (item.Feedbacks.Any())
                             {
@@ -100,7 +100,7 @@
 
                     <div class="item-actions">
                         <button class="btn-icon" title="Edit"><i class="bi bi-pencil"></i></button>
-                        <button class="btn-icon text-danger" title="Delete" @onclick:stopPropagation="true" @onclick="() => DeleteItem(item)"><i class="bi bi-trash"></i></button>
+                        <button class="btn-icon text-danger" title="Delete" @onclick:stopPropagation="true" @onclick="() => { itemToDelete = item; showDeleteModal = true; }"><i class="bi bi-trash"></i></button>
                         <i class="bi bi-chevron-right arrow-icon"></i>
                     </div>
                 </div>
@@ -109,9 +109,35 @@
     }
 </div>
 
+@if (showDeleteModal && itemToDelete != null)
+{
+    <div class="modal fade show @(isClosing ? "closing" : "")" style="display:block;" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 12px;">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" style="background: none; border: none; color: var(--text-main); font-size: 1.5rem; cursor: pointer;" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong>@itemToDelete.Title</strong>?</p>
+                    <p class="text-muted-custom small">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                    <button type="button" style="background-color: var(--border-color); color: var(--text-main); border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 500;" @onclick="CloseModal">Cancel</button>
+                    <button type="button" style="background-color: var(--accent-red); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 500;" @onclick="ConfirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show @(isClosing ? "closing" : "")" style="opacity: 0.75;"></div>
+}
+
 @code {
     private List<FeedbackItem> mySubmissions = new();
     private bool isLoading = true;
+    private FeedbackItem? itemToDelete;
+    private bool showDeleteModal = false;
+    private bool isClosing = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -151,12 +177,28 @@
         NavigationManager.NavigateTo($"/feedback-received/{itemId}");
     }
 
-    private async Task DeleteItem(FeedbackItem item)
+    private async Task ConfirmDelete()
     {
-        // In a real app, add confirmation
+        if (itemToDelete == null) return;
         using var context = DbFactory.CreateDbContext();
-        context.FeedbackItems.Remove(item);
+        context.FeedbackItems.Remove(itemToDelete);
         await context.SaveChangesAsync();
+        await CloseModalAndReset();
         await LoadSubmissions();
+    }
+
+    private async Task CloseModal()
+    {
+        await CloseModalAndReset();
+    }
+
+    private async Task CloseModalAndReset()
+    {
+        isClosing = true;
+        StateHasChanged();
+        await Task.Delay(300);
+        showDeleteModal = false;
+        isClosing = false;
+        itemToDelete = null;
     }
 }

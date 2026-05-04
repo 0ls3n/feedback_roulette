@@ -71,12 +71,11 @@
 
             <AuthorizeView>
                 <Authorized>
-                    <a style="text-decoration: none;" href="/Account/Logout">
-                        <AntiforgeryToken />
-                        <button type="submit" class="nav-item logout-button">
+                    <a href="/Account/Logout" style="text-decoration: none;">
+                        <div class="nav-item logout-button">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
-                        </button>
+                        </div>
                     </a>
                 </Authorized>
             </AuthorizeView>
@@ -88,7 +87,9 @@
                 <div class="sidebar-footer">
                     <div class="user-profile">
                         @{
-                            string profileSrc = $"https://ui-avatars.com/api/?name={context.User.Identity.Name}&background=5D5FEF&color=fff";
+                            string profileSrc = !string.IsNullOrEmpty(currentUser?.ProfileImageUrl) 
+                                ? currentUser.ProfileImageUrl 
+                                : $"https://ui-avatars.com/api/?name={context.User.Identity.Name}&background=5D5FEF&color=fff";
                         }
                         <img src="@profileSrc"
                              alt="User Avatar"

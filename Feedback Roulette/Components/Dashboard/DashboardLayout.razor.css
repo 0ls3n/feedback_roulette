@@ -264,13 +264,14 @@ a.active .nav-item {
     height: 44px;
     border-radius: 14px;
     object-fit: cover;
-    border: 2px solid transparent;
+
     flex-shrink: 0;
     transition: border 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(93, 95, 239, 0.3);
 }
 
 .dashboard-sidebar:hover .user-avatar {
-    border: 2px solid rgba(93, 95, 239, 0.3);
+    
 }
 
 .user-info {

@@ -172,14 +172,14 @@
             }
             
             var trustedFileName = Path.GetRandomFileName() + Path.GetExtension(selectedFile.Name);
-            var uploadPath = Path.Combine(Environment.WebRootPath, "uploads");
+            var userUploadPath = Path.Combine(Environment.WebRootPath, "uploads", user.Id, "submissions");
             
-            if (!Directory.Exists(uploadPath))
+            if (!Directory.Exists(userUploadPath))
             {
-                Directory.CreateDirectory(uploadPath);
+                Directory.CreateDirectory(userUploadPath);
             }
 
-            var filePath = Path.Combine(uploadPath, trustedFileName);
+            var filePath = Path.Combine(userUploadPath, trustedFileName);
 
             await using (FileStream fs = new(filePath, FileMode.Create))
             {
@@ -192,7 +192,7 @@
                 Description = $"{genre}\n\n{feedbackDescription}".Trim(),
                 ApplicationUserId = user.Id,
                 CategoryId = selectedCategoryId,
-                FileUrl = $"/uploads/{trustedFileName}",
+                FileUrl = $"/uploads/{user.Id}/submissions/{trustedFileName}",
                 FileType = selectedFile.ContentType,
                 FileSize = (selectedFile.Size / 1024.0 / 1024.0).ToString("F2") + " MB",
                 Feedbacks = new List<Feedback>()

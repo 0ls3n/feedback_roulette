@@ -102,7 +102,7 @@
                     @foreach (var item in recentSubmissions)
                     {
                         <div class="card-custom feedback-item"
-                             @onclick='() => NavigationManager.NavigateTo($"/feedback-received")'>
+                             @onclick='() => NavigationManager.NavigateTo($"/feedback-received/{item.Id}")'>
                             <div class="item-preview">
                                 @if (item.Category.Name == "Music")
                                 {

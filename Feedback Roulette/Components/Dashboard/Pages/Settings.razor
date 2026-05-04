@@ -7,10 +7,12 @@
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Forms
 
 @inject IIdentityService IdentityService
 @inject UserManager<ApplicationUser> UserManager
 @inject DataContext DbContext
+@inject IWebHostEnvironment Environment
 
 <div class="dashboard-content">
     <header class="content-header">
@@ -34,8 +36,11 @@
                         <h3>Profile Information</h3>
                         <div class="profile-edit">
                             <div class="profile-avatar-large">
-                                <img src="https://ui-avatars.com/api/?name=@(currentUser.UserName)&background=5D5FEF&color=fff&size=128" alt="Profile" />
-                                <button class="btn-change-avatar"><i class="bi bi-camera"></i></button>
+                                <img src="@(string.IsNullOrEmpty(currentUser?.ProfileImageUrl) ? $"https://ui-avatars.com/api/?name={currentUser?.UserName ?? "User"}&background=5D5FEF&color=fff&size=128" : currentUser.ProfileImageUrl)" alt="Profile" />
+                                <InputFile id="profileImageFile" OnChange="HandleProfileImageUpload" accept=".jpg,.jpeg,.png,.gif" style="display: none;" />
+                                <label for="profileImageFile" class="btn-change-avatar" style="cursor: pointer;">
+                                    <i class="bi bi-camera"></i>
+                                </label>
                             </div>
                             <div class="form-grid">
                                 <div class="form-group">
@@ -49,6 +54,10 @@
                                 </div>
                             </div>
                         </div>
+                        @if (!string.IsNullOrEmpty(profileImageError))
+                        {
+                            <div class="alert alert-danger mt-3">@profileImageError</div>
+                        }
                     </section>
 
                     <section class="settings-section card-custom">
@@ -126,6 +135,8 @@
 
 @code {
     private ApplicationUser? currentUser;
+    private string? profileImageError;
+    private readonly int maxImageSize = 1024 * 1024 * 5; // 5MB
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -134,6 +145,47 @@
             currentUser = await IdentityService.GetCurrentUserAsync();
             
             StateHasChanged();
+        }
+    }
+
+    private async Task HandleProfileImageUpload(InputFileChangeEventArgs e)
+    {
+        profileImageError = null;
+        var file = e.File;
+
+        if (file.Size > maxImageSize)
+        {
+            profileImageError = "Image must be smaller than 5MB.";
+            return;
+        }
+
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+            var trustedFileName = Path.GetRandomFileName() + Path.GetExtension(file.Name);
+            var profileImagePath = Path.Combine(Environment.WebRootPath, "uploads", user.Id, "profile");
+
+            if (!Directory.Exists(profileImagePath))
+            {
+                Directory.CreateDirectory(profileImagePath);
+            }
+
+            var filePath = Path.Combine(profileImagePath, trustedFileName);
+
+            await using (var fs = new FileStream(filePath, FileMode.Create))
+            {
+                await file.OpenReadStream(maxImageSize).CopyToAsync(fs);
+            }
+
+            user.ProfileImageUrl = $"/uploads/{user.Id}/profile/{trustedFileName}";
+            await UserManager.UpdateAsync(user);
+            currentUser = user;
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            profileImageError = $"Error uploading image: {ex.Message}";
         }
     }
 

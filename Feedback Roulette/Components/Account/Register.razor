@@ -34,7 +34,6 @@
             <div class="form-group">
                 <label for="username">Username</label>
                 <div class="input-wrapper">
-                    <i class="bi bi-person"></i>
                     <InputText id="username" @bind-Value="Input.Username" class="form-control" placeholder="johndoe" />
                 </div>
                 <ValidationMessage For="() => Input.Username" class="text-danger" />
@@ -43,7 +42,6 @@
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <div class="input-wrapper">
-                    <i class="bi bi-envelope"></i>
                     <InputText id="email" @bind-Value="Input.Email" class="form-control" placeholder="name@example.com" />
                 </div>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
@@ -52,7 +50,6 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-wrapper">
-                    <i class="bi bi-lock"></i>
                     <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" placeholder="••••••••" />
                 </div>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
@@ -61,7 +58,6 @@
             <div class="form-group">
                 <label for="confirm-password">Confirm Password</label>
                 <div class="input-wrapper">
-                    <i class="bi bi-shield-lock"></i>
                     <InputText id="confirm-password" type="password" @bind-Value="Input.ConfirmPassword" class="form-control" placeholder="••••••••" />
                 </div>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />

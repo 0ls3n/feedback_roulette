@@ -29,7 +29,7 @@
         <div class="leaderboard-container">
             <div class="user-rank-banner card-custom">
                 <div class="rank-profile">
-                    <img src="https://ui-avatars.com/api/?name=@(currentUser?.UserName)&background=5D5FEF&color=fff" alt="User Avatar" class="rank-avatar" />
+                    <img src="@(!string.IsNullOrEmpty(currentUser?.ProfileImageUrl) ? currentUser.ProfileImageUrl : $"https://ui-avatars.com/api/?name={currentUser?.UserName}&background=5D5FEF&color=fff")" alt="User Avatar" class="rank-avatar" />
                     <div class="rank-info">
                         <h3>@currentUser?.UserName <span class="badge-pro">Pro</span></h3>
                         <p>Your current activity stats</p>
@@ -59,7 +59,7 @@
                         var reviewer = topReviewers[i];
                         <div class="reviewer-item @(reviewer.UserId == currentUser?.Id ? "current-user" : "")">
                             <span class="rank-number">@(i + 1)</span>
-                            <img src="https://ui-avatars.com/api/?name=@(reviewer.UserName)&background=5D5FEF&color=fff" alt="Avatar" class="reviewer-avatar" />
+                            <img src="@(!string.IsNullOrEmpty(reviewer.ProfileImageUrl) ? reviewer.ProfileImageUrl : $"https://ui-avatars.com/api/?name={reviewer.UserName}&background=5D5FEF&color=fff")" alt="Avatar" class="reviewer-avatar" />
                             <span class="reviewer-name">
                                 @reviewer.UserName 
                                 @if (reviewer.UserId == currentUser?.Id)
@@ -129,6 +129,7 @@
                     { 
                         UserId = user.Id, 
                         UserName = user.UserName ?? "Unknown", 
+                        ProfileImageUrl = user.ProfileImageUrl,
                         FeedbackCount = item.Count 
                     });
                 }
@@ -148,6 +149,7 @@
     {
         public string UserId { get; set; } = "";
         public string UserName { get; set; } = "";
+        public string? ProfileImageUrl { get; set; }
         public int FeedbackCount { get; set; }
     }
 }

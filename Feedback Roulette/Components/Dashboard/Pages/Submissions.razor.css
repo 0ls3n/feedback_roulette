@@ -102,6 +102,10 @@
     font-weight: 700;
 }
 
+.modal-header {
+    justify-content: space-between;
+}
+
 .stat-label {
     font-size: 0.75rem;
     color: var(--text-muted);
@@ -181,4 +185,52 @@
 
 .text-purple {
     color: var(--primary-purple) !important;
+}
+
+.modal.fade.show {
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.fade.show.closing {
+    animation: modalFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-backdrop.fade.show {
+    animation: backdropFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-backdrop.fade.show.closing {
+    animation: backdropFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+}
+
+@keyframes backdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.75; }
+}
+
+@keyframes backdropFadeOut {
+    from { opacity: 0.75; }
+    to { opacity: 0; }
 }

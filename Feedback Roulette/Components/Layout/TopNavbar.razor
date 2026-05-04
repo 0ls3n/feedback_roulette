@@ -1,4 +1,11 @@
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using FeedbackRoulette_ClassLibrary
+
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@rendermode InteractiveServer
 
 <nav class="top-navbar">
     <div class="navbar-container">
@@ -14,7 +21,7 @@
                 <Authorized>
                     <div class="user-profile-nav">
                         <a href="dashboard" class="profile-link">
-                            <img src="https://ui-avatars.com/api/?name=@(context.User.Identity?.Name ?? "User")&background=5D5FEF&color=fff" alt="Profile" class="nav-avatar" />
+                            <img src="@(avatarSrc ?? $"https://ui-avatars.com/api/?name={context.User.Identity?.Name ?? "User"}&background=5D5FEF&color=fff")" alt="Profile" class="nav-avatar"/>
                         </a>
                     </div>
                 </Authorized>
@@ -28,6 +35,30 @@
         </div>
     </div>
 </nav>
+
+@code {
+    private string? avatarSrc;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var userId = UserManager.GetUserId(user);
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var appUser = await UserManager.FindByIdAsync(userId);
+                    avatarSrc = appUser?.ProfileImageUrl;
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+}
 
 <style>
     .top-navbar {
