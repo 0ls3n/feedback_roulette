@@ -90,8 +90,10 @@
             <div class="feedback-list">
                 @if (!recentSubmissions.Any())
                 {
-                    <div class="empty-state-small">
-                        <p>No submissions yet.
+                    <div class="empty-state card-custom">
+                        <i class="bi bi-folder-plus"></i>
+                        <h3>No submissions yet</h3>
+                        <p>
                             <NavLink href="upload">Upload something</NavLink>
                             to start!
                         </p>

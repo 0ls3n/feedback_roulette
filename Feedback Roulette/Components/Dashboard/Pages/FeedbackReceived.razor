@@ -1,3 +1,4 @@
+@page "/feedback-received"
 @page "/feedback-received/{ItemId:int}"
 @layout DashboardLayout
 @attribute [Authorize]
@@ -11,150 +12,329 @@
 @inject IDbContextFactory<DataContext> DbFactory
 @inject IIdentityService IdentityService
 
-<div class="dashboard-content">
-    @if (isLoading)
-    {
-        <div class="loading-state">
-            <div class="spinner-border text-purple" role="status"></div>
-            <p>Loading feedback...</p>
-        </div>
-    }
-    else if (item == null)
-    {
-        <div class="empty-state">
-            <h3>Submission not found</h3>
-            <p>The submission you are looking for does not exist or you don't have permission to view it.</p>
-            <NavLink href="/submissions" class="btn btn-purple">Back to My Submissions</NavLink>
-        </div>
-    }
-    else
-    {
-        <header class="content-header">
-            <div class="back-link">
-                <a href="/submissions"><i class="bi bi-arrow-left"></i> My Submissions</a>
+@if (ItemId.HasValue)
+{
+    // Detailed view - no sidebar, just the feedback for this item
+    <div class="dashboard-content">
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                <div class="spinner-border text-purple" role="status"></div>
+                <p>Loading feedback...</p>
             </div>
-            <h1>@item.Title</h1>
-        </header>
-
-        <div class="feedback-received-grid">
-            <div class="main-column">
-                <div class="card-custom player-preview-card">
-                     <div class="item-preview-large">
-                        <div class="item-icon-large">
-                            @if (item.Category.Name == "Music") { <i class="bi bi-music-note-beamed"></i> }
-                            else if (item.Category.Name == "Programming") { <i class="bi bi-code-slash"></i> }
-                            else { <i class="bi bi-file-earmark-text"></i> }
-                        </div>
-                        <div class="item-info-large">
-                            <h3>@item.Title</h3>
-                            <span>@item.Category.Name</span>
-                        </div>
-                    </div>
-                    <div class="rating-badge-large">
-                        <span class="rating-value">@item.Feedbacks.Count</span>
-                        <span class="rating-label">Total reviews received</span>
-                    </div>
+        }
+        else if (item == null)
+        {
+            <div class="empty-state card-custom">
+                <i class="bi bi-exclamation-circle"></i>
+                <h3>Submission not found</h3>
+                <p>The submission you are looking for does not exist or you don't have permission to view it.</p>
+                <NavLink href="/submissions" class="btn btn-purple">Back to My Submissions</NavLink>
+            </div>
+        }
+        else
+        {
+            <header class="content-header">
+                <div class="back-link">
+                    <a href="/submissions"><i class="bi bi-arrow-left"></i> My Submissions</a>
                 </div>
+                <h1>@item.Title</h1>
+            </header>
 
-                <div class="tabs-container">
-                    <button class="tab @(activeTab == "all" ? "active" : "")" @onclick='() => activeTab = "all"'>All Feedback (@item.Feedbacks.Count)</button>
-                    <button class="tab @(activeTab == "summary" ? "active" : "")" @onclick='() => activeTab = "summary"'>Summary</button>
-                </div>
-
-                @if (activeTab == "all")
-                {
-                    <section class="feedback-details-list">
-                        @if (!item.Feedbacks.Any())
-                        {
-                            <div class="empty-state-small mt-4">
-                                <p>No feedback received yet. Your work is still in the roulette!</p>
+            <div class="feedback-received-grid">
+                <div class="main-column">
+                    <div class="card-custom player-preview-card">
+                         <div class="item-preview-large">
+                            <div class="item-icon-large">
+                                @if (item.Category.Name == "Music") { <i class="bi bi-music-note-beamed"></i> }
+                                else if (item.Category.Name == "Programming") { <i class="bi bi-code-slash"></i> }
+                                else { <i class="bi bi-file-earmark-text"></i> }
                             </div>
-                        }
-                        else
-                        {
-                            @foreach (var feedback in item.Feedbacks)
+                            <div class="item-info-large">
+                                <h3>@item.Title</h3>
+                                <span>@item.Category.Name</span>
+                            </div>
+                        </div>
+                        <div class="rating-badge-large">
+                            <span class="rating-value">@item.Feedbacks.Count</span>
+                            <span class="rating-label">Total reviews received</span>
+                        </div>
+                    </div>
+
+                    <div class="tabs-container">
+                        <button class="tab @(activeTab == "all" ? "active" : "")" @onclick='() => activeTab = "all"'>All Feedback (@item.Feedbacks.Count)</button>
+                        <button class="tab @(activeTab == "summary" ? "active" : "")" @onclick='() => activeTab = "summary"'>Summary</button>
+                    </div>
+
+                    @if (activeTab == "all")
+                    {
+                        <section class="feedback-details-list">
+                            @if (!item.Feedbacks.Any())
                             {
-                                <div class="card-custom feedback-detail-item mb-3">
-                                    <div class="feedback-header">
-                                        <span class="reviewer-name">Reviewer</span>
-                                        <span class="feedback-date">Just now</span>
-                                    </div>
-                                    
-                                    @if (!string.IsNullOrWhiteSpace(feedback.PositiveFeedback))
-                                    {
-                                        <div class="feedback-section positive">
-                                            <label><i class="bi bi-hand-thumbs-up"></i> What works well</label>
-                                            <p>@feedback.PositiveFeedback</p>
-                                        </div>
-                                    }
-
-                                    @if (!string.IsNullOrWhiteSpace(feedback.NegativeFeedback))
-                                    {
-                                        <div class="feedback-section negative">
-                                            <label><i class="bi bi-hand-thumbs-down"></i> What could be improved</label>
-                                            <p>@feedback.NegativeFeedback</p>
-                                        </div>
-                                    }
-
-                                    @if (!string.IsNullOrWhiteSpace(feedback.Suggestion))
-                                    {
-                                        <div class="feedback-section suggestion">
-                                            <label><i class="bi bi-wrench"></i> Suggestions</label>
-                                            <p>@feedback.Suggestion</p>
-                                        </div>
-                                    }
+                                <div class="empty-state-small mt-4">
+                                    <p>No feedback received yet. Your work is still in the roulette!</p>
                                 </div>
                             }
-                        }
-                    </section>
-                }
-                else
-                {
-                    <section class="feedback-summary">
-                        <div class="summary-content">
-                            <h3>Feedback Overview</h3>
-                            <p class="ai-note">Breakdown of the feedback types received for this submission.</p>
-                            
-                            <ul class="pattern-list">
-                                <li>
-                                    <i class="bi bi-hand-thumbs-up pattern-icon green"></i>
-                                    <div>
-                                        <strong>@item.Feedbacks.Count(f => f.HasPositiveFeedback) Positive highlights</strong>
-                                        <p>Reviewers found things they liked in your work.</p>
+                            else
+                            {
+                                @foreach (var feedback in item.Feedbacks)
+                                {
+                                    <div class="card-custom feedback-detail-item mb-3">
+                                        <div class="feedback-header">
+                                            <span class="reviewer-name">Reviewer</span>
+                                            <span class="feedback-date">Just now</span>
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(feedback.PositiveFeedback))
+                                        {
+                                            <div class="feedback-section positive">
+                                                <label><i class="bi bi-hand-thumbs-up"></i> What works well</label>
+                                                <p>@feedback.PositiveFeedback</p>
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(feedback.NegativeFeedback))
+                                        {
+                                            <div class="feedback-section negative">
+                                                <label><i class="bi bi-hand-thumbs-down"></i> What could be improved</label>
+                                                <p>@feedback.NegativeFeedback</p>
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(feedback.Suggestion))
+                                        {
+                                            <div class="feedback-section suggestion">
+                                                <label><i class="bi bi-wrench"></i> Suggestions</label>
+                                                <p>@feedback.Suggestion</p>
+                                            </div>
+                                        }
                                     </div>
-                                </li>
-                                <li>
-                                    <i class="bi bi-hand-thumbs-down pattern-icon orange"></i>
-                                    <div>
-                                        <strong>@item.Feedbacks.Count(f => f.HasNegativeFeedback) Areas for improvement</strong>
-                                        <p>Common pain points identified by the community.</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <i class="bi bi-lightbulb pattern-icon purple"></i>
-                                    <div>
-                                        <strong>@item.Feedbacks.Count(f => f.HasSuggestion) Practical suggestions</strong>
-                                        <p>Actionable advice to take your work to the next level.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-                }
+                                }
+                            }
+                        </section>
+                    }
+                    else
+                    {
+                        <section class="feedback-summary">
+                            <div class="summary-content">
+                                <h3>Feedback Overview</h3>
+                                <p class="ai-note">Breakdown of the feedback types received for this submission.</p>
+
+                                <ul class="pattern-list">
+                                    <li>
+                                        <i class="bi bi-hand-thumbs-up pattern-icon green"></i>
+                                        <div>
+                                            <strong>@item.Feedbacks.Count(f => f.HasPositiveFeedback) Positive highlights</strong>
+                                            <p>Reviewers found things they liked in your work.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-hand-thumbs-down pattern-icon orange"></i>
+                                        <div>
+                                            <strong>@item.Feedbacks.Count(f => f.HasNegativeFeedback) Areas for improvement</strong>
+                                            <p>Common pain points identified by the community.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-lightbulb pattern-icon purple"></i>
+                                        <div>
+                                            <strong>@item.Feedbacks.Count(f => f.HasSuggestion) Practical suggestions</strong>
+                                            <p>Actionable advice to take your work to the next level.</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    }
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
+else
+{
+    // List view with sidebar showing all submissions with feedback
+    <div class="dashboard-content feedback-received-layout">
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                <div class="spinner-border text-purple" role="status"></div>
+                <p>Loading feedback...</p>
+            </div>
+        }
+        else if (!submissionsWithFeedback.Any())
+        {
+            <div class="empty-state card-custom">
+                <i class="bi bi-chat-left-dots"></i>
+                <h3>No feedback yet</h3>
+                <p>You haven't received any feedback yet. Keep uploading and reviewing to earn credits!</p>
+                <NavLink href="/review" class="btn btn-purple">Start Reviewing</NavLink>
+            </div>
+        }
+        else
+        {
+            <aside class="feedback-sidebar">
+                <h3 class="sidebar-title">Your Submissions</h3>
+                @foreach (var submission in submissionsWithFeedback)
+                {
+                    <NavLink href="@($"/feedback-received/{submission.Id}")" class="@($"submission-link {(item?.Id == submission.Id ? "active" : "")}")" Match="NavLinkMatch.All">
+                        <div class="submission-item">
+                            <div class="submission-icon">
+                                @if (submission.Category.Name == "Music") { <i class="bi bi-music-note-beamed"></i> }
+                                else if (submission.Category.Name == "Programming") { <i class="bi bi-code-slash"></i> }
+                                else { <i class="bi bi-file-earmark-text"></i> }
+                            </div>
+                            <div class="submission-info">
+                                <span class="submission-title">@submission.Title</span>
+                                <span class="feedback-count">@submission.Feedbacks.Count feedback</span>
+                            </div>
+                        </div>
+                    </NavLink>
+                }
+            </aside>
+
+            if (item == null)
+            {
+                <div class="empty-state card-custom">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <h3>Submission not found</h3>
+                    <p>The submission you are looking for does not exist or you don't have permission to view it.</p>
+                    <NavLink href="/submissions" class="btn btn-purple">Back to My Submissions</NavLink>
+                </div>
+            }
+            else
+            {
+            <div class="feedback-received-main">
+            <header class="content-header">
+                <div class="back-link">
+                    <a href="/submissions"><i class="bi bi-arrow-left"></i> My Submissions</a>
+                </div>
+                <h1>@item.Title</h1>
+            </header>
+
+            <div class="feedback-received-grid">
+                <div class="main-column">
+                    <div class="card-custom player-preview-card">
+                         <div class="item-preview-large">
+                            <div class="item-icon-large">
+                                @if (item.Category.Name == "Music") { <i class="bi bi-music-note-beamed"></i> }
+                                else if (item.Category.Name == "Programming") { <i class="bi bi-code-slash"></i> }
+                                else { <i class="bi bi-file-earmark-text"></i> }
+                            </div>
+                            <div class="item-info-large">
+                                <h3>@item.Title</h3>
+                                <span>@item.Category.Name</span>
+                            </div>
+                        </div>
+                        <div class="rating-badge-large">
+                            <span class="rating-value">@item.Feedbacks.Count</span>
+                            <span class="rating-label">Total reviews received</span>
+                        </div>
+                    </div>
+
+                    <div class="tabs-container">
+                        <button class="tab @(activeTab == "all" ? "active" : "")" @onclick='() => activeTab = "all"'>All Feedback (@item.Feedbacks.Count)</button>
+                        <button class="tab @(activeTab == "summary" ? "active" : "")" @onclick='() => activeTab = "summary"'>Summary</button>
+                    </div>
+
+                    @if (activeTab == "all")
+                    {
+                        <section class="feedback-details-list">
+                            @if (!item.Feedbacks.Any())
+                            {
+                                <div class="empty-state-small mt-4">
+                                    <p>No feedback received yet. Your work is still in the roulette!</p>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var feedback in item.Feedbacks)
+                                {
+                                    <div class="card-custom feedback-detail-item mb-3">
+                                        <div class="feedback-header">
+                                            <span class="reviewer-name">Reviewer</span>
+                                            <span class="feedback-date">Just now</span>
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(feedback.PositiveFeedback))
+                                        {
+                                            <div class="feedback-section positive">
+                                                <label><i class="bi bi-hand-thumbs-up"></i> What works well</label>
+                                                <p>@feedback.PositiveFeedback</p>
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(feedback.NegativeFeedback))
+                                        {
+                                            <div class="feedback-section negative">
+                                                <label><i class="bi bi-hand-thumbs-down"></i> What could be improved</label>
+                                                <p>@feedback.NegativeFeedback</p>
+                                            </div>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(feedback.Suggestion))
+                                        {
+                                            <div class="feedback-section suggestion">
+                                                <label><i class="bi bi-wrench"></i> Suggestions</label>
+                                                <p>@feedback.Suggestion</p>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                        </section>
+                    }
+                    else
+                    {
+                        <section class="feedback-summary">
+                            <div class="summary-content">
+                                <h3>Feedback Overview</h3>
+                                <p class="ai-note">Breakdown of the feedback types received for this submission.</p>
+
+                                <ul class="pattern-list">
+                                    <li>
+                                        <i class="bi bi-hand-thumbs-up pattern-icon green"></i>
+                                        <div>
+                                            <strong>@item.Feedbacks.Count(f => f.HasPositiveFeedback) Positive highlights</strong>
+                                            <p>Reviewers found things they liked in your work.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-hand-thumbs-down pattern-icon orange"></i>
+                                        <div>
+                                            <strong>@item.Feedbacks.Count(f => f.HasNegativeFeedback) Areas for improvement</strong>
+                                            <p>Common pain points identified by the community.</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-lightbulb pattern-icon purple"></i>
+                                        <div>
+                                            <strong>@item.Feedbacks.Count(f => f.HasSuggestion) Practical suggestions</strong>
+                                            <p>Actionable advice to take your work to the next level.</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    }
+                </div>
+            </div>
+            </div>
+            }
+        }
+    </div>
+}
 
 @code {
     [Parameter]
-    public int ItemId { get; set; }
+    public int? ItemId { get; set; }
 
     private FeedbackItem? item;
+    private List<FeedbackItem> submissionsWithFeedback = new();
     private bool isLoading = true;
     private string activeTab = "all";
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         await LoadData();
     }
@@ -166,10 +346,27 @@
         {
             var user = await IdentityService.GetCurrentUserAsync();
             using var context = DbFactory.CreateDbContext();
-            item = await context.FeedbackItems
-                .Include(i => i.Category)
-                .Include(i => i.Feedbacks)
-                .FirstOrDefaultAsync(i => i.Id == ItemId && i.ApplicationUserId == user.Id);
+
+            if (ItemId.HasValue)
+            {
+                // Just load the specific item
+                item = await context.FeedbackItems
+                    .Include(i => i.Category)
+                    .Include(i => i.Feedbacks)
+                    .FirstOrDefaultAsync(i => i.Id == ItemId && i.ApplicationUserId == user.Id);
+            }
+            else
+            {
+                // Load all submissions with feedback for the sidebar
+                submissionsWithFeedback = await context.FeedbackItems
+                    .Include(i => i.Category)
+                    .Include(i => i.Feedbacks)
+                    .Where(i => i.ApplicationUserId == user.Id && i.Feedbacks.Any())
+                    .OrderByDescending(i => i.Feedbacks.Max(f => f.Id))
+                    .ToListAsync();
+
+                item = submissionsWithFeedback.FirstOrDefault();
+            }
         }
         catch (Exception ex)
         {

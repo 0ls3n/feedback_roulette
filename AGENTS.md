@@ -100,7 +100,20 @@ Feedback Roulette.sln
 - Use `NavLink` for internal links (auto `active` class)
 - Sidebar nav defined in `DashboardLayout.razor`
 - Review is the primary page (first nav item, highlighted with gradient)
-- Routes: `/review`, `/dashboard`, `/upload`, `/submissions`, `/feedback-received`, `/leaderboard`, `/settings`
+- Routes: `/review`, `/dashboard`, `/upload`, `/submissions`, `/feedback-received`, `/feedback-received/{ItemId:int}`, `/leaderboard`, `/settings`
+
+### Feedback Received Page
+- **Optional ID route**: `/feedback-received` shows list view with sidebar of all submissions with feedback, displaying the latest feedback. `/feedback-received/{ItemId}` shows detailed view without sidebar (original behavior).
+- **Two view modes**:
+  - **List view (no ID)**: Shows sidebar with all submissions that have feedback, ordered by most recent. Clicking a submission navigates to the detail view.
+  - **Detail view (with ID)**: Shows full feedback details for a specific submission without the sidebar.
+- **Component lifecycle**: Uses `OnParametersSetAsync` instead of `OnInitializedAsync` to handle route parameter changes when navigating between items.
+- **Empty states**: Uses consistent `empty-state card-custom` styling with icon, heading, message, and action button (matching My Submissions page style).
+
+### Empty State Styling
+- **Global styles** in `wwwroot/dashboard.css`: Shared `.empty-state` class with centered layout, large icon, and consistent spacing.
+- **Usage**: Apply `empty-state card-custom` classes together for consistent appearance across all pages.
+- **Pages updated**: FeedbackReceived, Dashboard (Recent Submissions section), Review (already had it), Submissions (original reference).
 
 ### Authentication
 - Identity with email/password, no account confirmation required
