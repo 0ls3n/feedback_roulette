@@ -152,41 +152,57 @@
                 {
                     @foreach (var item in recentSubmissions)
                     {
-                        <div class="card-custom feedback-item"
+                        <div class="card-custom submission-item"
                              @onclick='() => NavigationManager.NavigateTo($"/feedback-received/{item.Id}")'>
-                            <div class="item-preview">
+                            <div class="item-type-icon @(item.Category.Name?.ToLower())">
                                 @if (item.Category.Name == "Music")
                                 {
-                                    <div class="placeholder-icon music"><i class="bi bi-music-note-beamed"></i></div>
+                                    <i class="bi bi-music-note-beamed"></i>
                                 }
                                 else if (item.Category.Name == "Programming")
                                 {
-                                    <div class="placeholder-icon code"><i class="bi bi-code-slash"></i></div>
+                                    <i class="bi bi-code-slash"></i>
                                 }
                                 else
                                 {
-                                    <div class="placeholder-icon generic"><i class="bi bi-file-earmark-text"></i></div>
+                                    <i class="bi bi-file-earmark-text"></i>
                                 }
-                                <button class="play-btn"><i class="bi bi-play-fill"></i></button>
                             </div>
+
                             <div class="item-details">
-                                <div class="item-title">@item.Title</div>
-                                <div class="item-meta">@item.Category.Name</div>
-                            </div>
-                            <div class="item-stats">
-                                <div class="stat-mini">
-                                    <span class="mini-value">@item.Feedbacks.Count</span>
-                                    <span class="mini-label">Feedback</span>
+                                <div class="item-title-row">
+                                    <h3 class="item-title">@item.Title</h3>
+                                    <span class="category-tag">@item.Category.Name</span>
                                 </div>
-                                @if (item.Feedbacks.Any())
-                                {
-                                    <div class="stat-rating">
-                                        <div class="rating-circle green">4.5</div>
-                                        <span class="mini-label">Avg. rating</span>
-                                    </div>
-                                }
-                                <i class="bi bi-chevron-right"></i>
+                                <div class="item-meta">
+                                    <span>Uploaded on @DateTime.Now.ToShortDateString()</span>
+                                    <span class="dot-separator">•</span>
+                                    <span>@item.FileSize</span>
+                                </div>
                             </div>
+
+                            <div class="item-stats">
+                                <div class="stat-group">
+                                    <span class="stat-value">@item.Feedbacks.Count</span>
+                                    <span class="stat-label">Reviews</span>
+                                </div>
+
+                                <div class="stat-group">
+                                    @if (item.Feedbacks.Any() && item.AverageRating > 0)
+                                    {
+                                        <div class="rating-indicator">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span>@item.AverageRating.ToString("0.0")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-rating">No rating</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <i class="bi bi-chevron-right arrow-icon"></i>
                         </div>
                     }
                 }

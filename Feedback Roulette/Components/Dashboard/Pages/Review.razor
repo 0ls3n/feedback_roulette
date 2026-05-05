@@ -138,9 +138,12 @@
     private string suggestion = "";
     private string? errorMessage;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadRandomItem();
+        if (firstRender)
+        {
+            await LoadRandomItem();
+        }
     }
 
     private async Task LoadRandomItem()

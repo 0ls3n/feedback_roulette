@@ -22,4 +22,22 @@ public class FeedbackItem
     public Category Category { get; set; }
     
     public List<Feedback> Feedbacks { get; set; }
+    
+    [NotMapped]
+    public double AverageRating
+    {
+        get
+        {
+            if (Feedbacks == null || !Feedbacks.Any())
+                return 0;
+            
+            var scores = Feedbacks.Select(f =>
+                f.HasPositiveFeedback && !f.HasNegativeFeedback ? 1 :
+                !f.HasPositiveFeedback && f.HasNegativeFeedback ? -1 :
+                0);
+            
+            var averageScore = scores.Average();
+            return (averageScore + 1) * 2 + 1;
+        }
+    }
 }

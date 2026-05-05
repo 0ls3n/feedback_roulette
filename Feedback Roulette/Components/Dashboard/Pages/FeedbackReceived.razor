@@ -54,8 +54,16 @@
                             </div>
                         </div>
                         <div class="rating-badge-large">
-                            <span class="rating-value">@item.Feedbacks.Count</span>
-                            <span class="rating-label">Total reviews received</span>
+                            @if (item.AverageRating > 0)
+                            {
+                                <span class="rating-value">@item.AverageRating.ToString("0.0")</span>
+                                <span class="rating-label">Average rating</span>
+                            }
+                            else
+                            {
+                                <span class="rating-value">@item.Feedbacks.Count</span>
+                                <span class="rating-label">Total reviews received</span>
+                            }
                         </div>
                     </div>
 
@@ -225,8 +233,16 @@ else
                             </div>
                         </div>
                         <div class="rating-badge-large">
-                            <span class="rating-value">@item.Feedbacks.Count</span>
-                            <span class="rating-label">Total reviews received</span>
+                            @if (item.AverageRating > 0)
+                            {
+                                <span class="rating-value">@item.AverageRating.ToString("0.0")</span>
+                                <span class="rating-label">Average rating</span>
+                            }
+                            else
+                            {
+                                <span class="rating-value">@item.Feedbacks.Count</span>
+                                <span class="rating-label">Total reviews received</span>
+                            }
                         </div>
                     </div>
 

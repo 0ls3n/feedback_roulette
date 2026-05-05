@@ -82,11 +82,11 @@
                         </div>
 
                         <div class="stat-group">
-                            @if (item.Feedbacks.Any())
+                            @if (item.Feedbacks.Any() && item.AverageRating > 0)
                             {
                                 <div class="rating-indicator">
                                     <i class="bi bi-star-fill"></i>
-                                    <span>4.5</span>
+                                    <span>@item.AverageRating.ToString("0.0")</span>
                                 </div>
                             }
                             else
