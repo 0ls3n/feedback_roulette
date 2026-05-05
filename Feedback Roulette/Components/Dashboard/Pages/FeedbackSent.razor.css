@@ -1,0 +1,118 @@
+.feedback-sent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.feedback-sent-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.2rem 1.8rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+}
+
+.feedback-sent-item:hover {
+    border-color: var(--primary-purple);
+    background-color: rgba(255, 255, 255, 0.02);
+    transform: translateY(-2px);
+}
+
+.item-type-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+}
+
+.item-type-icon.music {
+    background-color: rgba(93, 95, 239, 0.1);
+    color: var(--primary-purple);
+}
+
+.item-type-icon.programming {
+    background-color: rgba(60, 145, 241, 0.1);
+    color: #3C91F1;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+}
+
+.item-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.item-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.dot-separator {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.item-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0 1rem;
+}
+
+.badge-positive {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    background-color: rgba(70, 211, 158, 0.1);
+    color: var(--accent-green);
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.badge-negative {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    background-color: rgba(255, 92, 92, 0.1);
+    color: var(--accent-red);
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.badge-mixed {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    background-color: rgba(255, 159, 67, 0.1);
+    color: var(--accent-orange);
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.badge-suggestion {
+    font-size: 1rem;
+    color: var(--accent-orange);
+}
+
+.arrow-icon {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+}

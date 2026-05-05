@@ -109,8 +109,8 @@
 
 @if (showDeleteModal && itemToDelete != null)
 {
-    <div class="modal fade show @(isClosing ? "closing" : "")" style="display:block;" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade show @(isClosing ? "closing" : "")" style="display:block;" tabindex="-1" @onclick="CloseModal">
+        <div class="modal-dialog modal-dialog-centered" @onclick:stopPropagation>
             <div class="modal-content" style="background-color: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 12px;">
                 <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
                     <h5 class="modal-title">Confirm Delete</h5>
@@ -127,7 +127,7 @@
             </div>
         </div>
     </div>
-    <div class="modal-backdrop fade show @(isClosing ? "closing" : "")" style="opacity: 0.75;"></div>
+    <div class="modal-backdrop fade show @(isClosing ? "closing" : "")" style="opacity: 0.75;" @onclick="CloseModal"></div>
 }
 
 @code {

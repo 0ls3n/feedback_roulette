@@ -1,0 +1,127 @@
+@page "/feedback-sent"
+@layout DashboardLayout
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+@using Feedback_Roulette.Services
+@using FeedbackRoulette_ClassLibrary
+@using Microsoft.AspNetCore.Identity
+
+@inject IIdentityService IdentityService
+@inject IFeedbackService FeedbackService
+@inject NavigationManager NavigationManager
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <div class="back-link">
+            <a href="/dashboard"><i class="bi bi-arrow-left"></i> Dashboard</a>
+        </div>
+    </header>
+
+    <h1>Feedback Sent</h1>
+    <p class="text-muted-custom mb-4">All the feedback you've given to others.</p>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-purple" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading your feedback...</p>
+        </div>
+    }
+    else if (!feedbackList.Any())
+    {
+        <div class="empty-state card-custom">
+            <i class="bi bi-send"></i>
+            <h3>No feedback sent yet</h3>
+            <p>You haven't given any feedback yet. Start reviewing to earn credits!</p>
+            <NavLink href="review" class="btn btn-purple">Start Reviewing</NavLink>
+        </div>
+    }
+    else
+    {
+        <div class="feedback-sent-list">
+            @foreach (var feedback in feedbackList)
+            {
+                <div class="card-custom feedback-sent-item" @onclick='() => NavigationManager.NavigateTo($"/feedback-sent/{feedback.Id}")'>
+                    <div class="item-type-icon @(feedback.FeedbackItem?.Category?.Name?.ToLower())">
+                        @if (feedback.FeedbackItem?.Category?.Name == "Music")
+                        {
+                            <i class="bi bi-music-note-beamed"></i>
+                        }
+                        else if (feedback.FeedbackItem?.Category?.Name == "Programming")
+                        {
+                            <i class="bi bi-code-slash"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-file-earmark-text"></i>
+                        }
+                    </div>
+
+                    <div class="item-details">
+                        <div class="item-title-row">
+                            <h3 class="item-title">@feedback.FeedbackItem?.Title</h3>
+                            @if (feedback.HasPositiveFeedback && !feedback.HasNegativeFeedback)
+                            {
+                                <span class="badge-positive">Positive</span>
+                            }
+                            else if (!feedback.HasPositiveFeedback && feedback.HasNegativeFeedback)
+                            {
+                                <span class="badge-negative">Negative</span>
+                            }
+                            else if (feedback.HasPositiveFeedback && feedback.HasNegativeFeedback)
+                            {
+                                <span class="badge-mixed">Mixed</span>
+                            }
+                        </div>
+                        <div class="item-meta">
+                            <span>by @feedback.FeedbackItem?.ApplicationUser?.UserName</span>
+                            <span class="dot-separator">•</span>
+                            <span>@feedback.FeedbackItem?.Category?.Name</span>
+                        </div>
+                    </div>
+
+                    <div class="item-stats">
+                        @if (feedback.HasSuggestion)
+                        {
+                            <span class="badge-suggestion" title="Has suggestion"><i class="bi bi-lightbulb"></i></span>
+                        }
+                    </div>
+
+                    <i class="bi bi-chevron-right arrow-icon"></i>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private bool isLoading = true;
+    private List<Feedback> feedbackList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFeedback();
+    }
+
+    private async Task LoadFeedback()
+    {
+        isLoading = true;
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+            feedbackList = await FeedbackService.GetFeedbackByUserAsync(user.Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading feedback: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

@@ -77,35 +77,36 @@
 
 /* Review - Primary Action */
 .review-item {
-    background: linear-gradient(135deg, var(--primary-purple) 0%, #8E91FF 100%) !important;
-    color: #FFFFFF !important;
-    font-weight: 700 !important;
-    border: none !important;
-    box-shadow: 0 4px 16px rgba(93, 95, 239, 0.35);
+    border: 1px solid transparent !important;
+    background: 
+        linear-gradient(var(--sidebar-bg), var(--sidebar-bg)) padding-box,
+        linear-gradient(135deg, var(--primary-purple) 0%, #8E91FF 100%) border-box !important;
+    border-radius: 14px;
     margin-bottom: 0.25rem;
-}
-
-.review-item:hover {
-    box-shadow: 0 6px 20px rgba(93, 95, 239, 0.5) !important;
-    transform: translateY(-2px) !important;
-}
-
-.review-item i {
-    color: #FFFFFF !important;
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
-}
-
-.review-item.active {
-    background: linear-gradient(135deg, #4B4DDF 0%, #7B7EFF 100%) !important;
-    box-shadow: 0 4px 20px rgba(93, 95, 239, 0.5) !important;
+    padding: 0.9rem;
+    position: relative;
 }
 
 .dashboard-sidebar:hover .review-item {
     padding: 0.9rem 1.25rem !important;
 }
 
-.dashboard-sidebar:hover .review-item::before {
-    opacity: 1 !important;
+.review-item:hover {
+    background: 
+        linear-gradient(135deg, rgba(93, 95, 239, 0.15) 0%, rgba(142, 145, 255, 0.15) 100%) padding-box,
+        linear-gradient(135deg, var(--primary-purple) 0%, #8E91FF 100%) border-box !important;
+    box-shadow: 0 4px 16px rgba(93, 95, 239, 0.35);
+    transform: translateY(-2px) !important;
+}
+
+.review-item i {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+}
+
+.review-item.active {
+    background: linear-gradient(135deg, var(--primary-purple) 0%, #7B7EFF 100%) !important;
+    box-shadow: 0 4px 20px rgba(93, 95, 239, 0.5) !important;
+    border: none !important;
 }
 
 .nav-item i {

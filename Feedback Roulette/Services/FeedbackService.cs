@@ -76,5 +76,28 @@ namespace Feedback_Roulette.Services
             return await context.Feedbacks
                 .CountAsync(f => f.FeedbackItemId == itemId);
         }
+
+        public async Task<List<Feedback>> GetFeedbackByUserAsync(string userId)
+        {
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.Feedbacks
+                .Where(f => f.ApplicationUserId == userId)
+                .Include(f => f.FeedbackItem)
+                .ThenInclude(fi => fi.Category)
+                .Include(f => f.FeedbackItem.ApplicationUser)
+                .OrderByDescending(f => f.FeedbackItemId)
+                .ToListAsync();
+        }
+
+        public async Task<Feedback?> GetFeedbackByIdAsync(int feedbackId, string userId)
+        {
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.Feedbacks
+                .Where(f => f.Id == feedbackId && f.ApplicationUserId == userId)
+                .Include(f => f.FeedbackItem)
+                .ThenInclude(fi => fi.Category)
+                .Include(f => f.FeedbackItem.ApplicationUser)
+                .FirstOrDefaultAsync();
+        }
     }
 }

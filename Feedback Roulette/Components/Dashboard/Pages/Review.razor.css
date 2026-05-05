@@ -243,3 +243,96 @@
     width: 100%;
     margin-top: 1rem;
 }
+
+.step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.step {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 2px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.step.active {
+    background-color: var(--primary-purple);
+    color: white;
+    border-color: var(--primary-purple);
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.feedback-choice {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.choice-btn {
+    flex: 1;
+    padding: 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.choice-btn i {
+    font-size: 2.5rem;
+    transition: transform 0.2s;
+}
+
+.choice-btn:hover {
+    border-color: var(--primary-purple);
+    color: var(--text-main);
+    background-color: rgba(93, 95, 239, 0.05);
+}
+
+.choice-btn:hover i {
+    transform: scale(1.1);
+}
+
+.choice-btn.selected.positive {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    background-color: rgba(70, 211, 158, 0.1);
+}
+
+.choice-btn.selected.negative {
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+    background-color: rgba(255, 92, 92, 0.1);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.button-group .btn {
+    flex: 1;
+}

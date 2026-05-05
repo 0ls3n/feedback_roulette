@@ -4,6 +4,8 @@
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+@using System.Threading.Tasks
 @layout DashboardLayout
 @attribute [Authorize]
 @rendermode InteractiveServer
@@ -12,6 +14,9 @@
 @inject IDbContextFactory<DataContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject INotificationService NotificationService
+@inject IJSRuntime JSRuntime
+
+@implements IDisposable
 
 <div class="dashboard-content">
     @if (isLoading)
@@ -31,7 +36,7 @@
                 <p class="text-muted-custom">Help others improve and get better feedback in return.</p>
             </div>
             <div class="header-actions">
-                <div class="notification-bell-container">
+                <div class="notification-bell-container" @ref="notificationRef">
                     <button class="notification-btn" @onclick="ToggleNotificationDropdown">
                         <i class="bi bi-bell"></i>
                         @if (unreadCount > 0)
@@ -42,7 +47,7 @@
 
                     @if (showNotifications)
                     {
-                        <div class="notification-dropdown">
+                        <div class="notification-dropdown" @onclick:stopPropagation>
                             <div class="notification-header">
                                 <h6>Notifications</h6>
                                 @if (notifications.Any(n => !n.IsRead))
@@ -82,10 +87,9 @@
                         </div>
                     }
                 </div>
-                <NavLink href="upload" class="btn btn-purple">Upload</NavLink>
             </div>
         </header>
-
+        
         <div class="stats-grid">
             <div class="card-custom stat-card">
                 <div class="stat-info">
@@ -220,6 +224,7 @@
     private List<Notification> notifications = new();
     private int unreadCount = 0;
     private bool showNotifications = false;
+    private ElementReference notificationRef;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -227,36 +232,42 @@
         {
             await LoadDashboardData();
             await LoadNotifications();
+            
+            await JSRuntime.InvokeVoidAsync("registerClickOutside", notificationRef, DotNetObjectReference.Create(this));
         }
+    }
+
+    [JSInvokable]
+    public void CloseNotificationDropdown()
+    {
+        if (showNotifications)
+        {
+            showNotifications = false;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        JSRuntime.InvokeVoidAsync("unregisterClickOutside");
     }
 
     private async Task LoadDashboardData()
     {
         isLoading = true;
-        StateHasChanged();
-
         try
         {
             currentUser = await IdentityService.GetCurrentUserAsync();
-
-            using var context = DbFactory.CreateDbContext();
-            
-            // Get stats
-            feedbackGivenCount = await context.Feedbacks
+            feedbackGivenCount = await DbFactory.CreateDbContextAsync().Result.Feedbacks
                 .CountAsync(f => f.ApplicationUserId == currentUser.Id);
-
-            var mySubmissions = await context.FeedbackItems
-                .Include(i => i.Feedbacks)
+            feedbackReceivedCount = await DbFactory.CreateDbContextAsync().Result.FeedbackItems
                 .Where(i => i.ApplicationUserId == currentUser.Id)
-                .ToListAsync();
-
-            feedbackReceivedCount = mySubmissions.Sum(i => i.Feedbacks.Count);
-
-            // Get recent submissions
-            recentSubmissions = await context.FeedbackItems
+                .SelectMany(i => i.Feedbacks)
+                .CountAsync();
+            recentSubmissions = await DbFactory.CreateDbContextAsync().Result.FeedbackItems
+                .Where(i => i.ApplicationUserId == currentUser.Id)
                 .Include(i => i.Category)
                 .Include(i => i.Feedbacks)
-                .Where(i => i.ApplicationUserId == currentUser.Id)
                 .OrderByDescending(i => i.Id)
                 .Take(3)
                 .ToListAsync();

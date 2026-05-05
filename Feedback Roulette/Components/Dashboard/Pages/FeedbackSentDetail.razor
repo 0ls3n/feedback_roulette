@@ -1,0 +1,140 @@
+@page "/feedback-sent/{FeedbackId:int}"
+@layout DashboardLayout
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+@using Feedback_Roulette.Services
+@using FeedbackRoulette_ClassLibrary
+@using Microsoft.AspNetCore.Identity
+
+@inject IIdentityService IdentityService
+@inject IFeedbackService FeedbackService
+@inject NavigationManager NavigationManager
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <div class="back-link">
+            <a href="/feedback-sent"><i class="bi bi-arrow-left"></i> Back to Feedback Sent</a>
+        </div>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-purple" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading feedback details...</p>
+        </div>
+    }
+    else if (feedback == null)
+    {
+        <div class="empty-state card-custom">
+            <i class="bi bi-exclamation-circle"></i>
+            <h3>Feedback not found</h3>
+            <p>This feedback doesn't exist or you don't have permission to view it.</p>
+            <NavLink href="/feedback-sent" class="btn btn-purple">Back to Feedback Sent</NavLink>
+        </div>
+    }
+    else
+    {
+        <div class="feedback-detail">
+            <div class="card-custom feedback-item-card">
+                <div class="item-preview-large">
+                    <div class="item-icon-large @(feedback.FeedbackItem?.Category?.Name?.ToLower())">
+                        @if (feedback.FeedbackItem?.Category?.Name == "Music")
+                        {
+                            <i class="bi bi-music-note-beamed"></i>
+                        }
+                        else if (feedback.FeedbackItem?.Category?.Name == "Programming")
+                        {
+                            <i class="bi bi-code-slash"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-file-earmark-text"></i>
+                        }
+                    </div>
+                    <div class="item-info-large">
+                        <h3>@feedback.FeedbackItem?.Title</h3>
+                        <span>by @feedback.FeedbackItem?.ApplicationUser?.UserName</span>
+                        <span class="category-tag">@feedback.FeedbackItem?.Category?.Name</span>
+                    </div>
+                </div>
+
+                <div class="feedback-type-badges">
+                    @if (feedback.HasPositiveFeedback)
+                    {
+                        <span class="badge-positive"><i class="bi bi-hand-thumbs-up"></i> Positive</span>
+                    }
+                    @if (feedback.HasNegativeFeedback)
+                    {
+                        <span class="badge-negative"><i class="bi bi-hand-thumbs-down"></i> Negative</span>
+                    }
+                    @if (feedback.HasSuggestion)
+                    {
+                        <span class="badge-suggestion"><i class="bi bi-lightbulb"></i> Has Suggestion</span>
+                    }
+                </div>
+            </div>
+
+            <div class="feedback-content mt-4">
+                @if (feedback.HasPositiveFeedback)
+                {
+                    <div class="card-custom feedback-section">
+                        <h4><i class="bi bi-hand-thumbs-up"></i> What worked well</h4>
+                        <p>@feedback.PositiveFeedback</p>
+                    </div>
+                }
+
+                @if (feedback.HasNegativeFeedback)
+                {
+                    <div class="card-custom feedback-section">
+                        <h4><i class="bi bi-hand-thumbs-down"></i> What didn't work</h4>
+                        <p>@feedback.NegativeFeedback</p>
+                    </div>
+                }
+
+                @if (feedback.HasSuggestion)
+                {
+                    <div class="card-custom feedback-section">
+                        <h4><i class="bi bi-lightbulb"></i> Suggestions</h4>
+                        <p>@feedback.Suggestion</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int FeedbackId { get; set; }
+
+    private bool isLoading = true;
+    private Feedback? feedback;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFeedback();
+    }
+
+    private async Task LoadFeedback()
+    {
+        isLoading = true;
+        try
+        {
+            var user = await IdentityService.GetCurrentUserAsync();
+            feedback = await FeedbackService.GetFeedbackByIdAsync(FeedbackId, user.Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading feedback: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}
