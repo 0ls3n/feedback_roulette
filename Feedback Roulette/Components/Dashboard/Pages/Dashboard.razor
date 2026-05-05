@@ -123,16 +123,16 @@
             </div>
         </div>
 
-        <div class="card-custom unlock-banner">
-            <div class="unlock-info">
-                <h3>Give @(Math.Max(0, 3 - feedbackGivenCount % 3)) more feedback to unlock a new submission</h3>
-                <div class="progress-container">
-                    <div class="progress-bar-custom" style="width: @((feedbackGivenCount % 3) * 33.33)%;"></div>
-                </div>
-                <span class="progress-text">@(feedbackGivenCount % 3) / 3</span>
-            </div>
-            <button class="btn btn-purple" @onclick='() => NavigationManager.NavigateTo("/review")'>Review Now</button>
-        </div>
+        @* <div class="card-custom unlock-banner"> *@
+        @*     <div class="unlock-info"> *@
+        @*         <h3>Give @(Math.Max(0, 3 - feedbackGivenCount % 3)) more feedback to unlock a new submission</h3> *@
+        @*         <div class="progress-container"> *@
+        @*             <div class="progress-bar-custom" style="width: @((feedbackGivenCount % 3) * 33.33)%;"></div> *@
+        @*         </div> *@
+        @*         <span class="progress-text">@(feedbackGivenCount % 3) / 3</span> *@
+        @*     </div> *@
+        @*     <button class="btn btn-purple" @onclick='() => NavigationManager.NavigateTo("/review")'>Review Now</button> *@
+        @* </div> *@
 
         <section class="recent-feedback">
             <div class="section-header">
