@@ -44,15 +44,32 @@
 .rating-value {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--accent-green);
-    background: rgba(70, 211, 158, 0.1);
     width: 64px;
     height: 64px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid var(--accent-green);
+    border: 3px solid;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.rating-value.rating-red {
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+    background: rgba(255, 92, 92, 0.1);
+}
+
+.rating-value.rating-yellow {
+    color: #FFC107;
+    border-color: #FFC107;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.rating-value.rating-green {
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+    background: rgba(70, 211, 158, 0.1);
 }
 
 .rating-label {

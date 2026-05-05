@@ -56,7 +56,7 @@
                         <div class="rating-badge-large">
                             @if (item.AverageRating > 0)
                             {
-                                <span class="rating-value">@item.AverageRating.ToString("0.0")</span>
+                                <span class="rating-value @GetRatingClass(item.AverageRating)">@item.AverageRating.ToString("0.0")</span>
                                 <span class="rating-label">Average rating</span>
                             }
                             else
@@ -235,7 +235,7 @@ else
                         <div class="rating-badge-large">
                             @if (item.AverageRating > 0)
                             {
-                                <span class="rating-value">@item.AverageRating.ToString("0.0")</span>
+                                <span class="rating-value @GetRatingClass(item.AverageRating)">@item.AverageRating.ToString("0.0")</span>
                                 <span class="rating-label">Average rating</span>
                             }
                             else
@@ -347,6 +347,13 @@ else
     private List<FeedbackItem> submissionsWithFeedback = new();
     private bool isLoading = true;
     private string activeTab = "all";
+
+    private string GetRatingClass(double rating) => rating switch
+    {
+        <= 2.0 => "rating-red",
+        <= 3.5 => "rating-yellow",
+        _ => "rating-green"
+    };
 
     protected override async Task OnParametersSetAsync()
     {

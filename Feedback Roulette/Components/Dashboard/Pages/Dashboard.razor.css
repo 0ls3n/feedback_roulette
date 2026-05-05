@@ -254,9 +254,12 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    color: var(--accent-green);
     font-weight: 700;
 }
+
+.rating-indicator.rating-red { color: var(--accent-red); }
+.rating-indicator.rating-yellow { color: #FFC107; }
+.rating-indicator.rating-green { color: var(--accent-green); }
 
 .no-rating {
     font-size: 0.85rem;

@@ -1,5 +1,6 @@
 using FeedbackRoulette_ClassLibrary;
 using Feedback_Roulette.Data;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,11 +10,13 @@ namespace Feedback_Roulette.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _environment;
 
-        public FeedbackItemService(IDbContextFactory<DataContext> contextFactory, UserManager<ApplicationUser> userManager)
+        public FeedbackItemService(IDbContextFactory<DataContext> contextFactory, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment)
         {
             _contextFactory = contextFactory;
             _userManager = userManager;
+            _environment = environment;
         }
 
         public async Task<List<FeedbackItem>> GetUserSubmissionsAsync(string userId)
@@ -55,6 +58,15 @@ namespace Feedback_Roulette.Services
             
             if (item != null)
             {
+                if (!string.IsNullOrEmpty(item.FileUrl))
+                {
+                    var filePath = Path.Combine(_environment.WebRootPath, item.FileUrl.TrimStart('/'));
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+
                 context.FeedbackItems.Remove(item);
                 await context.SaveChangesAsync();
             }

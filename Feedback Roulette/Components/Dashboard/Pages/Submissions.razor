@@ -84,10 +84,10 @@
                         <div class="stat-group">
                             @if (item.Feedbacks.Any() && item.AverageRating > 0)
                             {
-                                <div class="rating-indicator">
-                                    <i class="bi bi-star-fill"></i>
-                                    <span>@item.AverageRating.ToString("0.0")</span>
-                                </div>
+                                    <div class="rating-indicator @GetRatingClass(item.AverageRating)">
+                                        <i class="bi bi-star-fill"></i>
+                                        <span>@item.AverageRating.ToString("0.0")</span>
+                                    </div>
                             }
                             else
                             {
@@ -145,6 +145,13 @@
             StateHasChanged();
         }
     }
+
+    private string GetRatingClass(double rating) => rating switch
+    {
+        <= 2.0 => "rating-red",
+        <= 3.5 => "rating-yellow",
+        _ => "rating-green"
+    };
 
     private async Task LoadSubmissions()
     {
