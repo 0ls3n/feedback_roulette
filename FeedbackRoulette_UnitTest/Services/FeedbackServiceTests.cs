@@ -19,6 +19,7 @@ namespace FeedbackRoulette_UnitTest.Services
         private ApplicationUser _itemOwner;
         private FeedbackItem _testItem;
         private INotificationService _notificationService;
+        private IStreakService _streakService;
 
         [TestInitialize]
         public void Setup()
@@ -66,7 +67,8 @@ namespace FeedbackRoulette_UnitTest.Services
             _userManager = new UserManager<ApplicationUser>(userStore, null, null, null, null, null, null, null, null);
             
             _notificationService = new NotificationService(dbFactory);
-            _service = new FeedbackService(dbFactory, _userManager, _notificationService);
+            _streakService = new StreakService(dbFactory);
+            _service = new FeedbackService(dbFactory, _userManager, _notificationService, _streakService);
         }
 
         [TestCleanup]

@@ -11,6 +11,7 @@ public class DataContext : IdentityDbContext<ApplicationUser>
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<FeedbackItem> FeedbackItems { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserStreak> UserStreaks { get; set; }
     
     public DataContext(DbContextOptions<DataContext> options)
         : base(options)

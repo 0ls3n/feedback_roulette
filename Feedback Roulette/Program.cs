@@ -40,6 +40,7 @@ builder.Services.AddScoped<IFeedbackItemService, FeedbackItemService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IStreakService, StreakService>();
 
 builder.Services.AddCascadingAuthenticationState();
 

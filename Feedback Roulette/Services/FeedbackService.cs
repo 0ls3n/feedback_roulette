@@ -10,12 +10,14 @@ namespace Feedback_Roulette.Services
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly INotificationService _notificationService;
+        private readonly IStreakService _streakService;
 
-        public FeedbackService(IDbContextFactory<DataContext> contextFactory, UserManager<ApplicationUser> userManager, INotificationService notificationService)
+        public FeedbackService(IDbContextFactory<DataContext> contextFactory, UserManager<ApplicationUser> userManager, INotificationService notificationService, IStreakService streakService)
         {
             _contextFactory = contextFactory;
             _userManager = userManager;
             _notificationService = notificationService;
+            _streakService = streakService;
         }
 
         public async Task<Feedback> SubmitFeedbackAsync(string userId, int feedbackItemId, string? positiveFeedback, string? negativeFeedback, string? suggestion)
@@ -45,6 +47,9 @@ namespace Feedback_Roulette.Services
             }
             
             await context.SaveChangesAsync();
+
+            // Update streak for the reviewer
+            await _streakService.RecordFeedbackAsync(userId);
 
             // Create notification for the owner of the feedback item
             var item = await context.FeedbackItems

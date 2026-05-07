@@ -14,6 +14,7 @@
 @inject IDbContextFactory<DataContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject INotificationService NotificationService
+@inject IStreakService StreakService
 @inject IJSRuntime JSRuntime
 
 @implements IDisposable
@@ -36,6 +37,18 @@
                 <p class="text-muted-custom">Help others improve and get better feedback in return.</p>
             </div>
             <div class="header-actions">
+                <div class="streak-display" title="Best: @longestStreak days">
+                    <i class="bi bi-fire"></i>
+                    @if (currentStreak > 0)
+                    {
+                        <span class="streak-count">@currentStreak</span>
+                        <span class="streak-label">day streak</span>
+                    }
+                    else
+                    {
+                        <span class="streak-label streak-start-text">Start a streak!</span>
+                    }
+                </div>
                 <div class="notification-bell-container" @ref="notificationRef">
                     <button class="notification-btn" @onclick="ToggleNotificationDropdown">
                         <i class="bi bi-bell"></i>
@@ -220,6 +233,8 @@
     private ApplicationUser? currentUser;
     private int feedbackGivenCount = 0;
     private int feedbackReceivedCount = 0;
+    private int currentStreak = 0;
+    private int longestStreak = 0;
     private List<FeedbackItem> recentSubmissions = new();
     private List<Notification> notifications = new();
     private int unreadCount = 0;
@@ -271,6 +286,10 @@
                 .OrderByDescending(i => i.Id)
                 .Take(3)
                 .ToListAsync();
+
+            var streakData = await StreakService.GetStreakAsync(currentUser.Id);
+            currentStreak = streakData.CurrentStreak;
+            longestStreak = streakData.LongestStreak;
         }
         catch (Exception ex)
         {
@@ -288,6 +307,15 @@
         <= 2.0 => "rating-red",
         <= 3.5 => "rating-yellow",
         _ => "rating-green"
+    };
+
+    private string GetStreakMessage() => currentStreak switch
+    {
+        1 => "Great start! You're on a 1-day streak!",
+        2 => "2 days strong! Keep the momentum going!",
+        3 => "3-day streak! You're on fire!",
+        _ when currentStreak >= 7 => $"🔥 {currentStreak}-day streak! Unstoppable!",
+        _ => $"{currentStreak}-day streak! Keep it up!"
     };
 
     private async Task LoadNotifications()
