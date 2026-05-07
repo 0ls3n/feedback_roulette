@@ -28,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Components\Dashboard\Layout\" />
       <Folder Include="wwwroot\uploads\" />
     </ItemGroup>
 

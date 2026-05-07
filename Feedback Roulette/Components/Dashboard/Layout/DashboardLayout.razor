@@ -4,9 +4,7 @@
 @using FeedbackRoulette_ClassLibrary
 @inherits LayoutComponentBase
 
-@inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
-
 
 <div class="dashboard-container">
     <aside class="dashboard-sidebar">
@@ -112,7 +110,12 @@
     </aside>
 
     <main class="dashboard-main">
-        @Body
+        
+        <TopBar/>
+        
+        <div class="content">
+            @Body
+        </div>
     </main>
 </div>
 

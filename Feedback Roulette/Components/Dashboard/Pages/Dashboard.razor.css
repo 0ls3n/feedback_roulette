@@ -1,7 +1,4 @@
 .content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
     margin-bottom: 2rem;
 }
 
@@ -9,25 +6,6 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin: 0;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.notification-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 1.4rem;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.notification-btn:hover {
-    color: var(--text-main);
 }
 
 .stats-grid {
@@ -82,39 +60,6 @@
 .stat-icon.purple { background-color: rgba(93, 95, 239, 0.1); color: var(--primary-purple); }
 .stat-icon.blue { background-color: rgba(60, 145, 241, 0.1); color: #3C91F1; }
 .stat-icon.pink { background-color: rgba(241, 60, 182, 0.1); color: #F13CB6; }
-
-.streak-display {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1rem;
-    background-color: rgba(255, 107, 53, 0.1);
-    border: 1px solid rgba(255, 107, 53, 0.25);
-    border-radius: 10px;
-    cursor: default;
-}
-
-.streak-display > i {
-    font-size: 1.3rem;
-    color: #FF6B35;
-}
-
-.streak-count {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #FF6B35;
-}
-
-.streak-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.streak-start-text {
-    font-weight: 500;
-    color: #FF6B35;
-    opacity: 0.85;
-}
 
 .unlock-banner {
     display: flex;

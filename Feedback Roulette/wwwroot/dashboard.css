@@ -65,9 +65,13 @@ body {
 .dashboard-main {
     flex: 1;
     margin-left: var(--sidebar-collapsed-width);
-    padding: 2rem;
+    padding: 0 1rem;
     background-color: var(--bg-dark);
     transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content {
+    padding: 1rem;
 }
 
 .dashboard-sidebar:hover ~ .dashboard-main {

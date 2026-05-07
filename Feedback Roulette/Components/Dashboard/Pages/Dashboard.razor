@@ -4,8 +4,8 @@
 @using Feedback_Roulette.Services
 @using FeedbackRoulette_ClassLibrary
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.JSInterop
 @using System.Threading.Tasks
+@using Feedback_Roulette.Components.Dashboard.Layout
 @layout DashboardLayout
 @attribute [Authorize]
 @rendermode InteractiveServer
@@ -13,11 +13,7 @@
 @inject IIdentityService IdentityService
 @inject IDbContextFactory<DataContext> DbFactory
 @inject NavigationManager NavigationManager
-@inject INotificationService NotificationService
 @inject IStreakService StreakService
-@inject IJSRuntime JSRuntime
-
-@implements IDisposable
 
 <div class="dashboard-content">
     @if (isLoading)
@@ -35,71 +31,6 @@
             <div class="welcome">
                 <h1>Welcome back, @currentUser?.UserName 👋</h1>
                 <p class="text-muted-custom">Help others improve and get better feedback in return.</p>
-            </div>
-            <div class="header-actions">
-                <div class="streak-display" title="Best: @longestStreak days">
-                    <i class="bi bi-fire"></i>
-                    @if (currentStreak > 0)
-                    {
-                        <span class="streak-count">@currentStreak</span>
-                        <span class="streak-label">day streak</span>
-                    }
-                    else
-                    {
-                        <span class="streak-label streak-start-text">Start a streak!</span>
-                    }
-                </div>
-                <div class="notification-bell-container" @ref="notificationRef">
-                    <button class="notification-btn" @onclick="ToggleNotificationDropdown">
-                        <i class="bi bi-bell"></i>
-                        @if (unreadCount > 0)
-                        {
-                            <span class="notification-badge"></span>
-                        }
-                    </button>
-
-                    @if (showNotifications)
-                    {
-                        <div class="notification-dropdown" @onclick:stopPropagation>
-                            <div class="notification-header">
-                                <h6>Notifications</h6>
-                                @if (notifications.Any(n => !n.IsRead))
-                                {
-                                    <button class="mark-all-read-btn" @onclick="MarkAllAsRead">
-                                        Mark all read
-                                    </button>
-                                }
-                            </div>
-
-                            <div class="notification-list">
-                                @if (notifications.Count == 0)
-                                {
-                                    <div class="no-notifications">
-                                        <i class="bi bi-bell-slash"></i>
-                                        <p>No notifications yet</p>
-                                    </div>
-                                }
-                                else
-                                {
-                                    foreach (var notification in notifications)
-                                    {
-                                        <div class="notification-item @(notification.IsRead ? "read" : "unread")"
-                                             @onclick="() => HandleNotificationClick(notification)">
-                                            <div class="notification-content">
-                                                <p>@notification.Message</p>
-                                                <small>@notification.CreatedAt.ToString("MMM dd, yyyy")</small>
-                                            </div>
-                                            @if (!notification.IsRead)
-                                            {
-                                                <div class="unread-indicator"></div>
-                                            }
-                                        </div>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
             </div>
         </header>
         
@@ -233,38 +164,14 @@
     private ApplicationUser? currentUser;
     private int feedbackGivenCount = 0;
     private int feedbackReceivedCount = 0;
-    private int currentStreak = 0;
-    private int longestStreak = 0;
     private List<FeedbackItem> recentSubmissions = new();
-    private List<Notification> notifications = new();
-    private int unreadCount = 0;
-    private bool showNotifications = false;
-    private ElementReference notificationRef;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await LoadDashboardData();
-            await LoadNotifications();
-            
-            await JSRuntime.InvokeVoidAsync("registerClickOutside", notificationRef, DotNetObjectReference.Create(this));
         }
-    }
-
-    [JSInvokable]
-    public void CloseNotificationDropdown()
-    {
-        if (showNotifications)
-        {
-            showNotifications = false;
-            StateHasChanged();
-        }
-    }
-
-    public void Dispose()
-    {
-        JSRuntime.InvokeVoidAsync("unregisterClickOutside");
     }
 
     private async Task LoadDashboardData()
@@ -286,10 +193,6 @@
                 .OrderByDescending(i => i.Id)
                 .Take(3)
                 .ToListAsync();
-
-            var streakData = await StreakService.GetStreakAsync(currentUser.Id);
-            currentStreak = streakData.CurrentStreak;
-            longestStreak = streakData.LongestStreak;
         }
         catch (Exception ex)
         {
@@ -308,75 +211,4 @@
         <= 3.5 => "rating-yellow",
         _ => "rating-green"
     };
-
-    private string GetStreakMessage() => currentStreak switch
-    {
-        1 => "Great start! You're on a 1-day streak!",
-        2 => "2 days strong! Keep the momentum going!",
-        3 => "3-day streak! You're on fire!",
-        _ when currentStreak >= 7 => $"🔥 {currentStreak}-day streak! Unstoppable!",
-        _ => $"{currentStreak}-day streak! Keep it up!"
-    };
-
-    private async Task LoadNotifications()
-    {
-        try
-        {
-            currentUser ??= await IdentityService.GetCurrentUserAsync();
-            if (currentUser != null)
-            {
-                notifications = await NotificationService.GetAllNotificationsAsync(currentUser.Id);
-                unreadCount = await NotificationService.GetUnreadCountAsync(currentUser.Id);
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading notifications: {ex.Message}");
-        }
-    }
-
-    private void ToggleNotificationDropdown()
-    {
-        showNotifications = !showNotifications;
-    }
-
-    private async Task MarkAllAsRead()
-    {
-        try
-        {
-            if (currentUser != null)
-            {
-                await NotificationService.MarkAllAsReadAsync(currentUser.Id);
-                await LoadNotifications();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error marking notifications as read: {ex.Message}");
-        }
-    }
-
-    private async Task HandleNotificationClick(Notification notification)
-    {
-        try
-        {
-            if (!notification.IsRead)
-            {
-                await NotificationService.MarkAsReadAsync(notification.Id);
-                await LoadNotifications();
-            }
-
-            if (!string.IsNullOrEmpty(notification.Link))
-            {
-                NavigationManager.NavigateTo(notification.Link);
-            }
-
-            showNotifications = false;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error handling notification click: {ex.Message}");
-        }
-    }
 }
