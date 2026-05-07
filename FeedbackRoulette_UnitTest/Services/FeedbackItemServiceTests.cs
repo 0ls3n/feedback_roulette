@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
 
 namespace FeedbackRoulette_UnitTest.Services
 {
@@ -44,7 +46,8 @@ namespace FeedbackRoulette_UnitTest.Services
             var userStore = new UserStore<ApplicationUser>(_context);
             _userManager = new UserManager<ApplicationUser>(userStore, null, null, null, null, null, null, null, null);
             
-            _service = new FeedbackItemService(dbFactory, _userManager);
+            var environment = new TestWebHostEnvironment();
+            _service = new FeedbackItemService(dbFactory, _userManager, environment);
         }
 
         [TestCleanup]
@@ -184,5 +187,15 @@ namespace FeedbackRoulette_UnitTest.Services
             var updatedUser = await _context.Users.FindAsync(_testUser.Id);
             Assert.AreEqual(initialCredits - 50, updatedUser.Credits);
         }
+    }
+
+    internal class TestWebHostEnvironment : IWebHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = "Development";
+        public string ApplicationName { get; set; } = "TestApp";
+        public string ContentRootPath { get; set; } = "";
+        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
+        public string WebRootPath { get; set; } = "";
+        public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
     }
 }
