@@ -179,15 +179,6 @@
     font-size: 2.2rem;
 }
 
-.loading-state {
-    padding: 10rem 0;
-    text-align: center;
-}
-
-.text-purple {
-    color: var(--primary-purple) !important;
-}
-
 .feedback-summary {
     display: grid;
     grid-template-columns: 1fr;

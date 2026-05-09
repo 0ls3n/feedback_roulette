@@ -161,7 +161,7 @@
     margin-left: 0.5rem;
 }
 
-.loading-state, .empty-state {
+.empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -184,10 +184,6 @@
     color: var(--text-muted);
     margin-bottom: 2rem;
     max-width: 400px;
-}
-
-.text-purple {
-    color: var(--primary-purple) !important;
 }
 
 .modal.fade.show {

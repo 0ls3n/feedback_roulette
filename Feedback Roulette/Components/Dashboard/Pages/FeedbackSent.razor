@@ -23,11 +23,49 @@
 
     @if (isLoading)
     {
-        <div class="loading-state">
-            <div class="spinner-border text-purple" role="status">
-                <span class="visually-hidden">Loading...</span>
+        <div class="feedback-sent-list">
+            <div class="skeleton-card feedback-sent-item">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="item-details">
+                    <div class="item-title-row">
+                        <div class="skeleton skeleton-title" style="width: 180px; height: 20px; margin: 0;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 50px;"></div>
+                    </div>
+                    <div class="skeleton skeleton-text" style="width: 250px; margin-top: 0.5rem;"></div>
+                </div>
+                <div class="item-stats">
+                    <div class="skeleton" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+                </div>
+                <div class="skeleton" style="width: 20px; height: 20px; border-radius: 50%;"></div>
             </div>
-            <p>Loading your feedback...</p>
+            <div class="skeleton-card feedback-sent-item">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="item-details">
+                    <div class="item-title-row">
+                        <div class="skeleton skeleton-title" style="width: 200px; height: 20px; margin: 0;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 40px;"></div>
+                    </div>
+                    <div class="skeleton skeleton-text" style="width: 220px; margin-top: 0.5rem;"></div>
+                </div>
+                <div class="item-stats">
+                    <div class="skeleton" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+                </div>
+                <div class="skeleton" style="width: 20px; height: 20px; border-radius: 50%;"></div>
+            </div>
+            <div class="skeleton-card feedback-sent-item">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="item-details">
+                    <div class="item-title-row">
+                        <div class="skeleton skeleton-title" style="width: 150px; height: 20px; margin: 0;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 55px;"></div>
+                    </div>
+                    <div class="skeleton skeleton-text" style="width: 190px; margin-top: 0.5rem;"></div>
+                </div>
+                <div class="item-stats">
+                    <div class="skeleton" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+                </div>
+                <div class="skeleton" style="width: 20px; height: 20px; border-radius: 50%;"></div>
+            </div>
         </div>
     }
     else if (!feedbackList.Any())

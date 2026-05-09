@@ -16,9 +16,36 @@
     <div class="dashboard-content">
         @if (isLoading)
         {
-            <div class="loading-state">
-                <div class="spinner-border text-purple" role="status"></div>
-                <p>Loading feedback...</p>
+            <div class="feedback-detail-skeleton">
+                <div class="skeleton skeleton-text-sm" style="width: 120px; margin-bottom: 1rem;"></div>
+                <div class="skeleton skeleton-title" style="width: 50%; margin-bottom: 2rem;"></div>
+
+                <div class="skeleton-card player-preview-card">
+                    <div class="item-preview-large">
+                        <div class="skeleton skeleton-icon" style="width: 64px; height: 64px;"></div>
+                        <div>
+                            <div class="skeleton skeleton-title" style="width: 150px; height: 20px; margin-bottom: 0.5rem;"></div>
+                            <div class="skeleton skeleton-text-sm" style="width: 80px;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton" style="width: 64px; height: 64px; border-radius: 50%;"></div>
+                </div>
+
+                <div style="display: flex; gap: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; padding-bottom: 0.5rem;">
+                    <div class="skeleton" style="width: 120px; height: 36px; border-radius: 8px;"></div>
+                    <div class="skeleton" style="width: 80px; height: 36px; border-radius: 8px;"></div>
+                </div>
+
+                <div class="skeleton-card" style="padding: 1.8rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1.8rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div class="skeleton skeleton-text-sm" style="width: 80px;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 60px;"></div>
+                    </div>
+                    <div class="skeleton skeleton-title" style="width: 140px; height: 16px; margin-bottom: 0.8rem;"></div>
+                    <div class="skeleton skeleton-text" style="width: 100%; height: 14px; margin-bottom: 0.4rem;"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%; height: 14px; margin-bottom: 0.4rem;"></div>
+                    <div class="skeleton skeleton-text" style="width: 60%; height: 14px;"></div>
+                </div>
             </div>
         }
         else if (item == null)
@@ -163,9 +190,55 @@ else
     <div class="dashboard-content feedback-received-layout">
         @if (isLoading)
         {
-            <div class="loading-state">
-                <div class="spinner-border text-purple" role="status"></div>
-                <p>Loading feedback...</p>
+            <div class="feedback-received-layout">
+                <aside class="feedback-sidebar">
+                    <div class="skeleton skeleton-text-sm" style="width: 100px; margin-bottom: 1rem;"></div>
+                    <div style="display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem;">
+                        <div class="skeleton skeleton-icon" style="width: 36px; height: 36px;"></div>
+                        <div>
+                            <div class="skeleton skeleton-text" style="width: 120px; height: 14px; margin-bottom: 0.3rem;"></div>
+                            <div class="skeleton skeleton-text-sm" style="width: 60px;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem;">
+                        <div class="skeleton skeleton-icon" style="width: 36px; height: 36px;"></div>
+                        <div>
+                            <div class="skeleton skeleton-text" style="width: 100px; height: 14px; margin-bottom: 0.3rem;"></div>
+                            <div class="skeleton skeleton-text-sm" style="width: 70px;"></div>
+                        </div>
+                    </div>
+                </aside>
+                <div class="feedback-received-main">
+                    <div class="skeleton skeleton-text-sm" style="width: 120px; margin-bottom: 1rem;"></div>
+                    <div class="skeleton skeleton-title" style="width: 50%; margin-bottom: 2rem;"></div>
+
+                    <div class="skeleton-card player-preview-card">
+                        <div class="item-preview-large">
+                            <div class="skeleton skeleton-icon" style="width: 64px; height: 64px;"></div>
+                            <div>
+                                <div class="skeleton skeleton-title" style="width: 150px; height: 20px; margin-bottom: 0.5rem;"></div>
+                                <div class="skeleton skeleton-text-sm" style="width: 80px;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton" style="width: 64px; height: 64px; border-radius: 50%;"></div>
+                    </div>
+
+                    <div style="display: flex; gap: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; padding-bottom: 0.5rem;">
+                        <div class="skeleton" style="width: 120px; height: 36px; border-radius: 8px;"></div>
+                        <div class="skeleton" style="width: 80px; height: 36px; border-radius: 8px;"></div>
+                    </div>
+
+                    <div class="skeleton-card" style="padding: 1.8rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1.8rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                            <div class="skeleton skeleton-text-sm" style="width: 80px;"></div>
+                            <div class="skeleton skeleton-text-sm" style="width: 60px;"></div>
+                        </div>
+                        <div class="skeleton skeleton-title" style="width: 140px; height: 16px; margin-bottom: 0.8rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 100%; height: 14px; margin-bottom: 0.4rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 80%; height: 14px; margin-bottom: 0.4rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 60%; height: 14px;"></div>
+                    </div>
+                </div>
             </div>
         }
         else if (!submissionsWithFeedback.Any())

@@ -19,9 +19,66 @@
 
     @if (isLoading)
     {
-        <div class="loading-state">
-            <div class="spinner-border text-purple" role="status"></div>
-            <p>Calculating rankings...</p>
+        <div class="leaderboard-container">
+            <div class="skeleton-card user-rank-banner">
+                <div class="rank-profile">
+                    <div class="skeleton skeleton-avatar" style="width: 64px; height: 64px;"></div>
+                    <div class="rank-info">
+                        <div class="skeleton skeleton-title" style="width: 140px; margin-bottom: 0.5rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 180px;"></div>
+                    </div>
+                </div>
+                <div class="rank-stats">
+                    <div class="rank-stat">
+                        <div class="skeleton" style="width: 40px; height: 28px; border-radius: 6px; margin-bottom: 4px;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 70px;"></div>
+                    </div>
+                    <div class="rank-stat">
+                        <div class="skeleton" style="width: 40px; height: 28px; border-radius: 6px; margin-bottom: 4px;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 90px;"></div>
+                    </div>
+                    <div class="rank-stat">
+                        <div class="skeleton" style="width: 40px; height: 28px; border-radius: 6px; margin-bottom: 4px;"></div>
+                        <div class="skeleton skeleton-text-sm" style="width: 60px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="skeleton-card top-reviewers">
+                <div class="skeleton skeleton-title" style="width: 120px; margin-bottom: 1.5rem;"></div>
+                <div class="reviewer-list">
+                    <div class="reviewer-item" style="padding: 0.8rem 1rem;">
+                        <div class="skeleton" style="width: 20px; height: 20px; border-radius: 4px; margin-right: 10px;"></div>
+                        <div class="skeleton skeleton-avatar" style="width: 32px; height: 32px; margin-right: 1rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 120px; height: 16px; margin: 0;"></div>
+                        <div class="skeleton" style="width: 30px; height: 20px; border-radius: 4px; margin-left: auto;"></div>
+                    </div>
+                    <div class="reviewer-item" style="padding: 0.8rem 1rem;">
+                        <div class="skeleton" style="width: 20px; height: 20px; border-radius: 4px; margin-right: 10px;"></div>
+                        <div class="skeleton skeleton-avatar" style="width: 32px; height: 32px; margin-right: 1rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 100px; height: 16px; margin: 0;"></div>
+                        <div class="skeleton" style="width: 25px; height: 20px; border-radius: 4px; margin-left: auto;"></div>
+                    </div>
+                    <div class="reviewer-item" style="padding: 0.8rem 1rem;">
+                        <div class="skeleton" style="width: 20px; height: 20px; border-radius: 4px; margin-right: 10px;"></div>
+                        <div class="skeleton skeleton-avatar" style="width: 32px; height: 32px; margin-right: 1rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 110px; height: 16px; margin: 0;"></div>
+                        <div class="skeleton" style="width: 28px; height: 20px; border-radius: 4px; margin-left: auto;"></div>
+                    </div>
+                    <div class="reviewer-item" style="padding: 0.8rem 1rem;">
+                        <div class="skeleton" style="width: 20px; height: 20px; border-radius: 4px; margin-right: 10px;"></div>
+                        <div class="skeleton skeleton-avatar" style="width: 32px; height: 32px; margin-right: 1rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 130px; height: 16px; margin: 0;"></div>
+                        <div class="skeleton" style="width: 30px; height: 20px; border-radius: 4px; margin-left: auto;"></div>
+                    </div>
+                    <div class="reviewer-item" style="padding: 0.8rem 1rem;">
+                        <div class="skeleton" style="width: 20px; height: 20px; border-radius: 4px; margin-right: 10px;"></div>
+                        <div class="skeleton skeleton-avatar" style="width: 32px; height: 32px; margin-right: 1rem;"></div>
+                        <div class="skeleton skeleton-text" style="width: 95px; height: 16px; margin: 0;"></div>
+                        <div class="skeleton" style="width: 22px; height: 20px; border-radius: 4px; margin-left: auto;"></div>
+                    </div>
+                </div>
+            </section>
         </div>
     }
     else
