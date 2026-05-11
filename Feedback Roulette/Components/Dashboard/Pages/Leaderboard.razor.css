@@ -79,6 +79,12 @@
     gap: 0.5rem;
 }
 
+.profile-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .reviewer-item {
     display: flex;
     align-items: center;

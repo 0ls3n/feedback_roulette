@@ -11,12 +11,16 @@ namespace Feedback_Roulette.Services
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _environment;
+        private readonly INotificationService _notificationService;
+        private readonly IFollowService _followService;
 
-        public FeedbackItemService(IDbContextFactory<DataContext> contextFactory, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment)
+        public FeedbackItemService(IDbContextFactory<DataContext> contextFactory, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, INotificationService notificationService, IFollowService followService)
         {
             _contextFactory = contextFactory;
             _userManager = userManager;
             _environment = environment;
+            _notificationService = notificationService;
+            _followService = followService;
         }
 
         public async Task<List<FeedbackItem>> GetUserSubmissionsAsync(string userId)
@@ -99,6 +103,18 @@ namespace Feedback_Roulette.Services
             }
             
             await context.SaveChangesAsync();
+
+            // Notify followers about the new submission
+            var followers = await _followService.GetFollowersAsync(userId);
+            foreach (var follower in followers)
+            {
+                await _notificationService.CreateNotificationAsync(
+                    follower.Id,
+                    $"{user?.UserName ?? "Someone"} uploaded a new submission: '{title}'",
+                    $"/profile/{userId}"
+                );
+            }
+
             return feedbackItem;
         }
 
@@ -118,6 +134,29 @@ namespace Feedback_Roulette.Services
                 .Include(i => i.ApplicationUser)
                 .Where(i => i.ApplicationUserId != userId && !reviewedItemIds.Contains(i.Id))
                 .ToListAsync();
+        }
+
+        public async Task<List<FeedbackItem>> GetSubmissionsByUserIdAsync(string userId)
+        {
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.FeedbackItems
+                .Include(i => i.Category)
+                .Include(i => i.Feedbacks)
+                .Include(i => i.ApplicationUser)
+                .Where(i => i.ApplicationUserId == userId)
+                .OrderByDescending(i => i.Id)
+                .ToListAsync();
+        }
+
+        public async Task<FeedbackItem?> GetSubmissionByIdPublicAsync(int id)
+        {
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.FeedbackItems
+                .Include(i => i.Category)
+                .Include(i => i.Feedbacks)
+                .ThenInclude(f => f.ApplicationUser)
+                .Include(i => i.ApplicationUser)
+                .FirstOrDefaultAsync(i => i.Id == id);
         }
     }
 }

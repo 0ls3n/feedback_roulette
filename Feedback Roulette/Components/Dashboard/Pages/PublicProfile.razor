@@ -1,0 +1,397 @@
+@page "/profile/{UserId}"
+@layout DashboardLayout
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+@using Feedback_Roulette.Services
+@using FeedbackRoulette_ClassLibrary
+
+@inject IIdentityService IdentityService
+@inject IFeedbackItemService FeedbackItemService
+@inject IFeedbackService FeedbackService
+@inject IFollowService FollowService
+@inject NavigationManager NavigationManager
+
+<div class="dashboard-content">
+    <header class="content-header">
+        <div class="back-link">
+            <a href="/dashboard"><i class="bi bi-arrow-left"></i> Dashboard</a>
+        </div>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="profile-loading">
+            <div class="skeleton skeleton-avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem;"></div>
+            <div class="skeleton skeleton-title" style="width: 200px; margin: 0 auto 0.5rem;"></div>
+            <div class="skeleton skeleton-text" style="width: 140px; margin: 0 auto 2rem;"></div>
+            <div class="skeleton-card" style="height: 100px;"></div>
+        </div>
+    }
+    else if (profileUser == null)
+    {
+        <div class="empty-state card-custom">
+            <i class="bi bi-person-x"></i>
+            <h3>User not found</h3>
+            <p>This user doesn't exist or their profile is not available.</p>
+            <NavLink href="/dashboard" class="btn btn-purple">Back to Dashboard</NavLink>
+        </div>
+    }
+    else
+    {
+        <div class="profile-header card-custom">
+            <div class="profile-avatar-section">
+                <img src="@profileAvatar" alt="@profileUser.UserName" class="profile-avatar" />
+                <div class="profile-info">
+                    <h1>@profileUser.UserName</h1>
+                    <div class="profile-stats">
+                        <span><strong>@submissions.Count</strong> submissions</span>
+                        <span class="dot-separator">·</span>
+                        <span><strong>@followerCount</strong> @(followerCount == 1 ? "follower" : "followers")</span>
+                        <span class="dot-separator">·</span>
+                        <span><strong>@followingCount</strong> following</span>
+                    </div>
+                </div>
+            </div>
+            @if (!isOwnProfile)
+            {
+                <button class="btn @(isFollowing ? "btn-outline-secondary" : "btn-purple") follow-btn"
+                        @onclick="ToggleFollow" disabled="@isFollowLoading">
+                    @if (isFollowLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                    }
+                    else if (isFollowing)
+                    {
+                        <span><i class="bi bi-check-fill"></i> Following</span>
+                    }
+                    else
+                    {
+                        <span><i class="bi bi-plus"></i> Follow</span>
+                    }
+                </button>
+            }
+        </div>
+
+        <div class="profile-submissions">
+            <h2>Submissions</h2>
+            @if (!submissions.Any())
+            {
+                <div class="empty-state card-custom">
+                    <i class="bi bi-folder"></i>
+                    <h3>No submissions yet</h3>
+                    <p>This user hasn't uploaded anything for feedback yet.</p>
+                </div>
+            }
+            else
+            {
+                <div class="submissions-list">
+                    @foreach (var item in submissions)
+                    {
+                        <div class="submission-card card-custom">
+                            <div class="submission-header">
+                                <div class="item-type-icon @item.Category?.Name?.ToLower()">
+                                    @if (item.Category?.Name == "Music")
+                                    {
+                                        <i class="bi bi-music-note-beamed"></i>
+                                    }
+                                    else if (item.Category?.Name == "Programming")
+                                    {
+                                        <i class="bi bi-code-slash"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    }
+                                </div>
+                                <div class="submission-info">
+                                    <h3>@item.Title</h3>
+                                    <div class="submission-meta">
+                                        <span class="category-tag">@item.Category?.Name</span>
+                                        <span class="dot-separator">·</span>
+                                        <span>@item.Feedbacks?.Count feedback</span>
+                                        @if (item.AverageRating > 0)
+                                        {
+                                            <span class="dot-separator">·</span>
+                                            <span class="rating-indicator rating-@GetRatingClass(item.AverageRating)">
+                                                <i class="bi bi-star-fill"></i> @item.AverageRating.ToString("F1")
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                <p class="submission-desc">@item.Description</p>
+                            }
+                            <div class="submission-actions">
+                                @if (!isOwnProfile)
+                                {
+                                    <button class="btn btn-purple btn-sm" @onclick="() => OpenFeedbackModal(item)">
+                                        <i class="bi bi-chat-dots"></i> Give Feedback
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (showFeedbackModal && feedbackTarget != null)
+{
+    <div class="modal-overlay" @onclick="CloseFeedbackModal">
+        <div class="modal-content card-custom" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3>Give Feedback on "@feedbackTarget.Title"</h3>
+                <button class="modal-close" @onclick="CloseFeedbackModal"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="modal-body">
+                @if (fbStep == 1)
+                {
+                    <div class="feedback-choice">
+                        <button class="choice-btn @(fbIsPositive ? "selected positive" : "")"
+                                @onclick="() => { fbIsPositive = true; fbIsNegative = false; }">
+                            <i class="bi bi-hand-thumbs-up-fill"></i>
+                            <span>I like it</span>
+                        </button>
+                        <button class="choice-btn @(fbIsNegative ? "selected negative" : "")"
+                                @onclick="() => { fbIsNegative = true; fbIsPositive = false; }">
+                            <i class="bi bi-hand-thumbs-down-fill"></i>
+                            <span>I don't like it</span>
+                        </button>
+                    </div>
+                    <button class="btn btn-purple btn-block"
+                            @onclick="() => { if (fbIsPositive || fbIsNegative) fbStep = 2; }"
+                            disabled="@(!fbIsPositive && !fbIsNegative)">
+                        Continue
+                    </button>
+                }
+                else if (fbStep == 2)
+                {
+                    <div class="step-indicator">
+                        <span class="step" @onclick="() => fbStep = 1" style="cursor: pointer;">1</span>
+                        <span class="step active">2</span>
+                        <span class="step-label">Tell us why</span>
+                    </div>
+
+                    @if (fbIsPositive)
+                    {
+                        <div class="form-section">
+                            <label><i class="bi bi-hand-thumbs-up"></i> What did you like?</label>
+                            <textarea class="form-control-custom" rows="3" @bind="fbPositive" placeholder="What worked well? Be specific..."></textarea>
+                        </div>
+                    }
+
+                    @if (fbIsNegative)
+                    {
+                        <div class="form-section">
+                            <label><i class="bi bi-hand-thumbs-down"></i> What didn't work?</label>
+                            <textarea class="form-control-custom" rows="3" @bind="fbNegative" placeholder="What could be improved? Be constructive..."></textarea>
+                        </div>
+                    }
+
+                    <div class="form-section">
+                        <label><i class="bi bi-lightbulb"></i> Suggestions (optional)</label>
+                        <textarea class="form-control-custom" rows="3" @bind="fbSuggestion" placeholder="How could it be better?"></textarea>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(fbError))
+                    {
+                        <div class="alert alert-danger mb-3">@fbError</div>
+                    }
+
+                    <div class="button-group">
+                        <button class="btn btn-outline-secondary" @onclick="() => fbStep = 1">Back</button>
+                        <button class="btn btn-purple" @onclick="SubmitProfileFeedback" disabled="@fbSubmitting">
+                            @if (fbSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm"></span>
+                                <span> Submitting...</span>
+                            }
+                            else
+                            {
+                                <span>Submit Feedback (+10 Credits)</span>
+                            }
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    private bool isLoading = true;
+    private ApplicationUser? profileUser;
+    private ApplicationUser? currentUser;
+    private List<FeedbackItem> submissions = new();
+    private int followerCount;
+    private int followingCount;
+    private bool isFollowing;
+    private bool isFollowLoading;
+    private bool isOwnProfile;
+
+    // Feedback modal state
+    private bool showFeedbackModal;
+    private FeedbackItem? feedbackTarget;
+    private int fbStep = 1;
+    private bool fbIsPositive;
+    private bool fbIsNegative;
+    private string fbPositive = "";
+    private string fbNegative = "";
+    private string fbSuggestion = "";
+    private string? fbError;
+    private bool fbSubmitting;
+
+    private string profileAvatar => !string.IsNullOrEmpty(profileUser?.ProfileImageUrl)
+        ? profileUser.ProfileImageUrl
+        : $"https://ui-avatars.com/api/?name={profileUser?.UserName}&background=5D5FEF&color=fff";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadProfile();
+        }
+    }
+
+    private async Task LoadProfile()
+    {
+        isLoading = true;
+        showFeedbackModal = false;
+        StateHasChanged();
+
+        try
+        {
+            currentUser = await IdentityService.GetCurrentUserAsync();
+            profileUser = await IdentityService.GetUserByIdAsync(UserId);
+
+            if (profileUser != null)
+            {
+                isOwnProfile = profileUser.Id == currentUser.Id;
+
+                var subsTask = FeedbackItemService.GetSubmissionsByUserIdAsync(UserId);
+                var followerCountTask = FollowService.GetFollowerCountAsync(UserId);
+                var followingCountTask = FollowService.GetFollowingCountAsync(UserId);
+                Task<bool>? followingTask = isOwnProfile ? null : FollowService.IsFollowingAsync(currentUser.Id, UserId);
+
+                await Task.WhenAll(subsTask, followerCountTask, followingCountTask);
+
+                submissions = subsTask.Result;
+                followerCount = followerCountTask.Result;
+                followingCount = followingCountTask.Result;
+                isFollowing = followingTask?.Result ?? false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading profile: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleFollow()
+    {
+        if (isOwnProfile || profileUser == null) return;
+        isFollowLoading = true;
+        try
+        {
+            if (isFollowing)
+            {
+                await FollowService.UnfollowUserAsync(currentUser!.Id, profileUser.Id);
+                isFollowing = false;
+                followerCount--;
+            }
+            else
+            {
+                await FollowService.FollowUserAsync(currentUser!.Id, profileUser.Id);
+                isFollowing = true;
+                followerCount++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error toggling follow: {ex.Message}");
+        }
+        finally
+        {
+            isFollowLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OpenFeedbackModal(FeedbackItem item)
+    {
+        feedbackTarget = item;
+        fbStep = 1;
+        fbIsPositive = false;
+        fbIsNegative = false;
+        fbPositive = "";
+        fbNegative = "";
+        fbSuggestion = "";
+        fbError = null;
+        showFeedbackModal = true;
+    }
+
+    private void CloseFeedbackModal()
+    {
+        showFeedbackModal = false;
+        feedbackTarget = null;
+    }
+
+    private async Task SubmitProfileFeedback()
+    {
+        if (feedbackTarget == null) return;
+
+        if (string.IsNullOrWhiteSpace(fbPositive) &&
+            string.IsNullOrWhiteSpace(fbNegative) &&
+            string.IsNullOrWhiteSpace(fbSuggestion))
+        {
+            fbError = "Please provide some feedback before submitting.";
+            return;
+        }
+
+        fbSubmitting = true;
+        fbError = null;
+        StateHasChanged();
+
+        try
+        {
+            await FeedbackService.SubmitFeedbackAsync(
+                currentUser!.Id,
+                feedbackTarget.Id,
+                fbPositive,
+                fbNegative,
+                fbSuggestion
+            );
+
+            CloseFeedbackModal();
+        }
+        catch (Exception ex)
+        {
+            fbError = $"Error submitting feedback: {ex.Message}";
+        }
+        finally
+        {
+            fbSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetRatingClass(double rating)
+    {
+        if (rating <= 2.0) return "red";
+        if (rating <= 3.5) return "yellow";
+        return "green";
+    }
+}

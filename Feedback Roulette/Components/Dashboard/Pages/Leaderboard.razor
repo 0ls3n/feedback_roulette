@@ -84,29 +84,31 @@
     else
     {
         <div class="leaderboard-container">
-            <div class="user-rank-banner card-custom">
-                <div class="rank-profile">
-                    <img src="@(!string.IsNullOrEmpty(currentUser?.ProfileImageUrl) ? currentUser.ProfileImageUrl : $"https://ui-avatars.com/api/?name={currentUser?.UserName}&background=5D5FEF&color=fff")" alt="User Avatar" class="rank-avatar" />
-                    <div class="rank-info">
-                        <h3>@currentUser?.UserName <span class="badge-pro">Pro</span></h3>
-                        <p>Your current activity stats</p>
+            <a href="/profile/@(currentUser?.Id)" class="profile-link">
+                <div class="user-rank-banner card-custom">
+                    <div class="rank-profile">
+                        <img src="@(!string.IsNullOrEmpty(currentUser?.ProfileImageUrl) ? currentUser.ProfileImageUrl : $"https://ui-avatars.com/api/?name={currentUser?.UserName}&background=5D5FEF&color=fff")" alt="User Avatar" class="rank-avatar" />
+                        <div class="rank-info">
+                            <h3>@currentUser?.UserName <span class="badge-pro">Pro</span></h3>
+                            <p>Your current activity stats</p>
+                        </div>
+                    </div>
+                    <div class="rank-stats">
+                        <div class="rank-stat">
+                            <span class="stat-value">@userFeedbackGiven</span>
+                            <span class="stat-label">Reviews Given</span>
+                        </div>
+                        <div class="rank-stat">
+                            <span class="stat-value">@userFeedbackReceived</span>
+                            <span class="stat-label">Reviews Received</span>
+                        </div>
+                        <div class="rank-stat">
+                            <span class="stat-value">@userSubmissions</span>
+                            <span class="stat-label">Submissions</span>
+                        </div>
                     </div>
                 </div>
-                <div class="rank-stats">
-                    <div class="rank-stat">
-                        <span class="stat-value">@userFeedbackGiven</span>
-                        <span class="stat-label">Reviews Given</span>
-                    </div>
-                    <div class="rank-stat">
-                        <span class="stat-value">@userFeedbackReceived</span>
-                        <span class="stat-label">Reviews Received</span>
-                    </div>
-                    <div class="rank-stat">
-                        <span class="stat-value">@userSubmissions</span>
-                        <span class="stat-label">Submissions</span>
-                    </div>
-                </div>
-            </div>
+            </a>
 
             <section class="top-reviewers card-custom">
                 <h3>Top Reviewers</h3>
@@ -114,22 +116,24 @@
                     @for (int i = 0; i < topReviewers.Count; i++)
                     {
                         var reviewer = topReviewers[i];
-                        <div class="reviewer-item @(reviewer.UserId == currentUser?.Id ? "current-user" : "")">
-                            <span class="rank-number">@(i + 1)</span>
-                            <img src="@(!string.IsNullOrEmpty(reviewer.ProfileImageUrl) ? reviewer.ProfileImageUrl : $"https://ui-avatars.com/api/?name={reviewer.UserName}&background=5D5FEF&color=fff")" alt="Avatar" class="reviewer-avatar" />
-                            <span class="reviewer-name">
-                                @reviewer.UserName 
-                                @if (reviewer.UserId == currentUser?.Id)
-                                {
-                                    <span class="user-tag">You</span>
-                                }
-                                else
-                                {
-                                    <span class="badge-pro-mini">Pro</span>
-                                }
-                            </span>
-                            <span class="reviewer-score">@reviewer.FeedbackCount</span>
-                        </div>
+                        <a href="/profile/@reviewer.UserId" class="profile-link">
+                            <div class="reviewer-item @(reviewer.UserId == currentUser?.Id ? "current-user" : "")">
+                                <span class="rank-number">@(i + 1)</span>
+                                <img src="@(!string.IsNullOrEmpty(reviewer.ProfileImageUrl) ? reviewer.ProfileImageUrl : $"https://ui-avatars.com/api/?name={reviewer.UserName}&background=5D5FEF&color=fff")" alt="Avatar" class="reviewer-avatar" />
+                                <span class="reviewer-name">
+                                    @reviewer.UserName 
+                                    @if (reviewer.UserId == currentUser?.Id)
+                                    {
+                                        <span class="user-tag">You</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-pro-mini">Pro</span>
+                                    }
+                                </span>
+                                <span class="reviewer-score">@reviewer.FeedbackCount</span>
+                            </div>
+                        </a>
                     }
                 </div>
             </section>
@@ -145,9 +149,13 @@
     private int userSubmissions;
     private List<ReviewerRank> topReviewers = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadLeaderboard();
+        if (firstRender)
+        {
+            await LoadLeaderboard();
+            StateHasChanged();
+        }
     }
 
     private async Task LoadLeaderboard()

@@ -47,7 +47,9 @@ namespace FeedbackRoulette_UnitTest.Services
             _userManager = new UserManager<ApplicationUser>(userStore, null, null, null, null, null, null, null, null);
             
             var environment = new TestWebHostEnvironment();
-            _service = new FeedbackItemService(dbFactory, _userManager, environment);
+            var notificationService = new MockNotificationService();
+            var followService = new MockFollowService();
+            _service = new FeedbackItemService(dbFactory, _userManager, environment, notificationService, followService);
         }
 
         [TestCleanup]
@@ -197,5 +199,26 @@ namespace FeedbackRoulette_UnitTest.Services
         public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
         public string WebRootPath { get; set; } = "";
         public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
+    }
+
+    public class MockNotificationService : INotificationService
+    {
+        public Task<List<Notification>> GetUnreadNotificationsAsync(string userId) => Task.FromResult(new List<Notification>());
+        public Task<List<Notification>> GetAllNotificationsAsync(string userId) => Task.FromResult(new List<Notification>());
+        public Task<int> GetUnreadCountAsync(string userId) => Task.FromResult(0);
+        public Task MarkAsReadAsync(int notificationId) => Task.CompletedTask;
+        public Task MarkAllAsReadAsync(string userId) => Task.CompletedTask;
+        public Task CreateNotificationAsync(string userId, string message, string? link = null) => Task.CompletedTask;
+    }
+
+    public class MockFollowService : IFollowService
+    {
+        public Task FollowUserAsync(string followerUserId, string followedUserId) => Task.CompletedTask;
+        public Task UnfollowUserAsync(string followerUserId, string followedUserId) => Task.CompletedTask;
+        public Task<bool> IsFollowingAsync(string followerUserId, string followedUserId) => Task.FromResult(false);
+        public Task<int> GetFollowerCountAsync(string userId) => Task.FromResult(0);
+        public Task<int> GetFollowingCountAsync(string userId) => Task.FromResult(0);
+        public Task<List<ApplicationUser>> GetFollowersAsync(string userId) => Task.FromResult(new List<ApplicationUser>());
+        public Task<List<ApplicationUser>> GetFollowingAsync(string userId) => Task.FromResult(new List<ApplicationUser>());
     }
 }

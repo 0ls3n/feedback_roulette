@@ -11,5 +11,7 @@ namespace Feedback_Roulette.Services
         Task DeleteSubmissionAsync(int id, string userId);
         Task<FeedbackItem> CreateSubmissionAsync(string userId, string title, int categoryId, string description, string fileUrl, string fileType, string fileSize);
         Task<List<FeedbackItem>> GetAvailableItemsForReviewAsync(string userId);
+        Task<List<FeedbackItem>> GetSubmissionsByUserIdAsync(string userId);
+        Task<FeedbackItem?> GetSubmissionByIdPublicAsync(int id);
     }
 }

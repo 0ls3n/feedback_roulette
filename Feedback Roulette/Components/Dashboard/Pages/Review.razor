@@ -105,12 +105,12 @@
 
                         <div class="feedback-choice">
                             <button class="choice-btn @(isPositive ? "selected positive" : "")" @onclick="() => { isPositive = true; isNegative = false; }">
-                                <i class="bi bi-hand-thumbs-up-fill"></i>
-                                <span>I like it</span>
+                                <i class="bi bi-emoji-smile-fill"></i>
+                                <span>Works well</span>
                             </button>
                             <button class="choice-btn @(isNegative ? "selected negative" : "")" @onclick="() => { isNegative = true; isPositive = false; }">
-                                <i class="bi bi-hand-thumbs-down-fill"></i>
-                                <span>I don't like it</span>
+                                <i class="bi bi-tools"></i>
+                                <span>Needs improvement</span>
                             </button>
                         </div>
 

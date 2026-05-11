@@ -1,10 +1,10 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Identity
 @using FeedbackRoulette_ClassLibrary
+@using Feedback_Roulette.Services
 @inherits LayoutComponentBase
 
-@inject UserManager<ApplicationUser> UserManager
+@inject IIdentityService IdentityService
 
 <div class="dashboard-container">
     <aside class="dashboard-sidebar">
@@ -89,22 +89,24 @@
 
         <AuthorizeView>
             <Authorized>
-                <div class="sidebar-footer">
-                    <div class="user-profile">
-                        @{
-                            string profileSrc = !string.IsNullOrEmpty(currentUser?.ProfileImageUrl) 
-                                ? currentUser.ProfileImageUrl 
-                                : $"https://ui-avatars.com/api/?name={context.User.Identity.Name}&background=5D5FEF&color=fff";
-                        }
-                        <img src="@profileSrc"
-                             alt="User Avatar"
-                             class="user-avatar"/>
-                        <div class="user-info">
-                            <div class="user-name">@context.User.Identity.Name<span class="badge-pro">Pro</span></div>
-                            <div class="user-credits">@(currentUser?.Credits ?? 0) credits</div>
+                <a href="/profile/@(currentUser?.Id)" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-footer">
+                        <div class="user-profile">
+                            @{
+                                string profileSrc = !string.IsNullOrEmpty(currentUser?.ProfileImageUrl) 
+                                    ? currentUser.ProfileImageUrl 
+                                    : $"https://ui-avatars.com/api/?name={context.User.Identity.Name}&background=5D5FEF&color=fff";
+                            }
+                            <img src="@profileSrc"
+                                 alt="User Avatar"
+                                 class="user-avatar"/>
+                            <div class="user-info">
+                                <div class="user-name">@context.User.Identity.Name<span class="badge-pro">Pro</span></div>
+                                <div class="user-credits">@(currentUser?.Credits ?? 0) credits</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </Authorized>
         </AuthorizeView>
     </aside>
@@ -120,26 +122,17 @@
 </div>
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthStateTask { get; set; }
-
     private ApplicationUser? currentUser;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (AuthStateTask != null)
+        try
         {
-            var authState = await AuthStateTask;
-            var user = authState.User;
-
-            if (user.Identity?.IsAuthenticated == true)
-            {
-                var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId != null)
-                {
-                    currentUser = await UserManager.FindByIdAsync(userId);
-                }
-            }
+            currentUser = await IdentityService.GetCurrentUserAsync();
+        }
+        catch
+        {
+            // User not authenticated or not found — leave currentUser null
         }
     }
 }
